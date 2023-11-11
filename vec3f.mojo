@@ -1,6 +1,7 @@
 from math import rsqrt
 
 
+@value
 @register_passable("trivial")
 struct Vec3f:
     var data: SIMD[DType.float32, 4]
@@ -8,10 +9,6 @@ struct Vec3f:
     @always_inline
     fn __init__(x: Float32, y: Float32, z: Float32) -> Self:
         return Vec3f {data: SIMD[DType.float32, 4](x, y, z, 0)}
-
-    @always_inline
-    fn __init__(data: SIMD[DType.float32, 4]) -> Self:
-        return Vec3f {data: data}
 
     @always_inline
     @staticmethod
