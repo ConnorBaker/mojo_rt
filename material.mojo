@@ -2,6 +2,7 @@ from math import sqrt
 from vec3f import Vec3f
 
 
+@value
 @register_passable("trivial")
 struct Material:
     var color: Vec3f
@@ -10,11 +11,6 @@ struct Material:
 
     fn __init__(color: Vec3f) -> Material:
         return Material {color: color, albedo: Vec3f(0, 0, 0), specular_component: 0}
-
-    fn __init__(color: Vec3f, albedo: Vec3f, specular_component: Float32) -> Material:
-        return Material {
-            color: color, albedo: albedo, specular_component: specular_component
-        }
 
 
 alias W = 1024
