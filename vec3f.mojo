@@ -31,7 +31,7 @@ struct Vec3f:
 
     @always_inline
     fn __neg__(self) -> Vec3f:
-        return self.data * -1.0
+        return -self.data
 
     @always_inline
     fn __getitem__(self, idx: Int) -> SIMD[DType.float32, 1]:
