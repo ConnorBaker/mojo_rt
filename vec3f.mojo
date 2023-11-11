@@ -14,20 +14,24 @@ struct Vec3f:
         return Vec3f {data: SIMD[DType.float32, 4](x, y, z, 0)}
 
     @always_inline
-    fn __sub__(self, other: Vec3f) -> Vec3f:
-        return self.data - other.data
+    fn __sub__(self, rhs: Vec3f) -> Vec3f:
+        return self.data - rhs.data
 
     @always_inline
-    fn __add__(self, other: Vec3f) -> Vec3f:
-        return self.data + other.data
+    fn __add__(self, rhs: Vec3f) -> Vec3f:
+        return self.data + rhs.data
 
     @always_inline
-    fn __matmul__(self, other: Vec3f) -> Float32:
-        return (self.data * other.data).reduce_add()
+    fn __matmul__(self, rhs: Vec3f) -> Float32:
+        return (self.data * rhs.data).reduce_add()
 
     @always_inline
-    fn __mul__(self, k: Float32) -> Vec3f:
-        return self.data * k
+    fn __mul__(self, rhs: Float32) -> Vec3f:
+        return self.data * rhs
+
+    @always_inline
+    fn __rmul__(self, lhs: Float32) -> Vec3f:
+        return lhs * self.data
 
     @always_inline
     fn __neg__(self) -> Vec3f:
@@ -38,11 +42,23 @@ struct Vec3f:
         return self.data[idx]
 
     @always_inline
+    fn normalize(self) -> Vec3f:
+        return self.data * rsqrt(self.magnitude_sq())
+
+    @always_inline
+    fn magnitude_sq(self) -> Float32:
+        return (self.data**2).reduce_add()
+
+    @always_inline
+    fn magnitude(self) -> Float32:
+        return self.magnitude_sq() ** 0.5
+
+    @always_inline
     fn cross(self, other: Vec3f) -> Vec3f:
         let self_zxy = self.data.shuffle[2, 0, 1, 3]()
         let other_zxy = other.data.shuffle[2, 0, 1, 3]()
-        return (self_zxy * other.data - self.data * other_zxy).shuffle[2, 0, 1, 3]()
-
-    @always_inline
-    fn normalize(self) -> Vec3f:
-        return self.data * rsqrt(self @ self)
+        let crossed = (self_zxy * other.data - self.data * other_zxy).shuffle[
+            2, 0, 1, 3
+        ]()
+        debug_assert(crossed[3] == 0, "Cross product should have 0 in the w component")
+        return crossed
