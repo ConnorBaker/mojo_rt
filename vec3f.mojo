@@ -6,14 +6,12 @@ from math import rsqrt
 struct Vec3f:
     var data: SIMD[DType.float32, 4]
 
+    alias zero = Vec3f(0, 0, 0)
+    alias one = Vec3f(1, 1, 1)
+
     @always_inline
     fn __init__(x: Float32, y: Float32, z: Float32) -> Self:
         return Vec3f {data: SIMD[DType.float32, 4](x, y, z, 0)}
-
-    @always_inline
-    @staticmethod
-    fn zero() -> Vec3f:
-        return Vec3f(0, 0, 0)
 
     @always_inline
     fn __sub__(self, other: Vec3f) -> Vec3f:

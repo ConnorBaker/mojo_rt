@@ -20,9 +20,9 @@ fn cast_ray(
     lights: DynamicVector[Light],
     bg: Image,
 ) -> Material:
-    var point = Vec3f.zero()
-    var material = Material(Vec3f.zero())
-    var N = Vec3f.zero()
+    var point = Vec3f.zero
+    var material = Material(Vec3f.zero)
+    var N = Vec3f.zero
     if not scene_intersect(orig, dir, spheres, material, point, N):
         # Background
         # Given a direction vector `dir` we need to find a pixel in the image
@@ -95,7 +95,7 @@ fn create_image_with_spheres_and_specular_lights(
         for col in range(width):
             let x = ((2.0 * col + 1) / width - 1) * width / height
             let dir = Vec3f(x, y, -1).normalize()
-            image.set(row, col, cast_ray(Vec3f.zero(), dir, spheres, lights, bg).color)
+            image.set(row, col, cast_ray(Vec3f.zero, dir, spheres, lights, bg).color)
 
     parallelize[_process_row](height)
 
