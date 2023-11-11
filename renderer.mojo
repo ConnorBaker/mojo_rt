@@ -1,5 +1,5 @@
 from image import Image
-from material import Material, bg_color
+from material import Material
 from sphere import Sphere
 from vec3f import Vec3f
 from light import Light
