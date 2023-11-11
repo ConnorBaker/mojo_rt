@@ -2,14 +2,13 @@ from vec3f import Vec3f
 from material import Material
 from math import sqrt
 
+
+@value
 @register_passable("trivial")
 struct Sphere:
     var center: Vec3f
     var radius: Float32
     var material: Material
-
-    fn __init__(c: Vec3f, r: Float32, material: Material) -> Self:
-        return Sphere {center: c, radius: r, material: material}
 
     @always_inline
     fn intersects(self, orig: Vec3f, dir: Vec3f, inout dist: Float32) -> Bool:
