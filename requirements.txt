@@ -1,1 +1,0 @@
-opencv-contrib-python-headless-rolling==5.0.0.20221015

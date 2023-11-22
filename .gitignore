@@ -2,3 +2,4 @@
 *.png
 !simple.png
 main
+main.dSYM
