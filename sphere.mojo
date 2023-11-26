@@ -21,8 +21,7 @@ struct Sphere:
         self,
         r: Ray3,
         ray_t: Interval,
-        inout rec: HitRecord,
-    ) -> Bool:
+    ) -> HitRecord:
         let oc: Vec3 = r.origin - self.center
         # NOTE: The magnitude of the direction vector is always 1, so we can
         # ignore a throughout when multiplying or dividing by it.
@@ -35,7 +34,7 @@ struct Sphere:
         let discriminant: F = pow(neg_half_b, 2) - c  # * a, but a == 1
 
         if discriminant < 0.0:
-            return False
+            return HitRecord.BOGUS
 
         let sqrtd: F = sqrt(discriminant)
         let root: F
@@ -46,16 +45,14 @@ struct Sphere:
         elif ray_t.surrounds(test_root_2):
             root = test_root_2
         else:
-            return False
+            return HitRecord.BOGUS
 
-        rec.t = root
-        rec.p = r[root]
+        let p = r[root]
+        let t = root
         # With spheres, we can compute the normal directly from the hit point
         # and the center of the sphere by dividing the vector between them by
         # the radius of the sphere.
         # We use Unit3's dict constructor here to avoid a redundant sqrt in
         # the Vec3 constructor which calculates the magnitude.
-        let outward_normal: Unit3 = Unit3 {value: (rec.p - self.center) / self.radius}
-        rec.set_face_normal(r, outward_normal)
-
-        return True
+        let outward_normal: Unit3 = Unit3 {value: (p - self.center) / self.radius}
+        return HitRecord(p, t, r, outward_normal)

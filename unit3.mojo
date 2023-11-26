@@ -26,6 +26,10 @@ struct Unit3:
         return value.norm()
 
     @always_inline
+    fn __eq__(self, other: Self) -> Bool:
+        return self.value == other.value
+
+    @always_inline
     fn __neg__(self) -> Self:
         # Negation does not change the magnitude of the vector.
         return Unit3 {value: -self.value}

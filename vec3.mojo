@@ -12,17 +12,6 @@ struct Vec3:
     A 3D vector.
     """
 
-    # Maintaining the invariant that the last component remain zero
-    # is a bit tricky.
-    # It precludes us from using SIMD operations which broadcast a scalar
-    # to a SIMD vector, since the last component of the result can be nonzero.
-    # There are a number of ways to handle this:
-    #
-    # 1. Use a helper function which always sets the last component to zero.
-    # 2. Manually create a SIMD vector with the last component zeroed (or equivalent identity under the operation).
-    #
-    # We take the second approach here, since it is more efficient.
-
     var value: F4
 
     alias _div_add_mask: F4 = mk_F4(w=1.0)

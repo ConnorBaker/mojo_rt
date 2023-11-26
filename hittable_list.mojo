@@ -1,5 +1,3 @@
-from utils.vector import DynamicVector
-
 from hittable import HitRecord
 from interval import Interval
 from ray3 import Ray3
@@ -20,18 +18,14 @@ struct HittableList:
         self,
         r: Ray3,
         ray_t: Interval,
-        inout rec: HitRecord,
-    ) -> Bool:
-        var temp_rec = rec.__copy__()
-        var hit_anything = False
+    ) -> HitRecord:
+        var rec = HitRecord.BOGUS
         var closest_so_far = ray_t.max
 
         for i in range(len(self.value)):
-            let object = self.value[i]
-            if object.hit(r, Interval(ray_t.min, closest_so_far), temp_rec):
-                hit_anything = True
+            let temp_rec = self.value[i].hit(r, Interval(ray_t.min, closest_so_far))
+            if not temp_rec.is_bogus():
                 closest_so_far = temp_rec.t
-                # TODO: Does this actually update rec, or just the stack copy of the value?
                 rec = temp_rec
 
-        return hit_anything
+        return rec

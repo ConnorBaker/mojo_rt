@@ -45,12 +45,15 @@ struct Camera[config: CameraConfig]:
 
     @always_inline
     fn ray_color(self, r: Ray3, world: HittableList) -> Color:
-        var rec = HitRecord.bogus()
+        var rec = HitRecord.BOGUS
         var current_ray = r
         var current_depth = 0
         var light_attenuation = 1.0
 
-        while current_depth < config.renderer.max_depth and world.hit(current_ray, config.renderer.hit_interval, rec):
+        while current_depth < config.renderer.max_depth:
+            rec = world.hit(current_ray, config.renderer.hit_interval)
+            if rec.is_bogus():
+                break
 
             @parameter
             if config.renderer.use_lambertian:

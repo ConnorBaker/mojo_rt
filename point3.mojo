@@ -17,6 +17,10 @@ struct Point3:
         return Self {value: Vec3(x, y, z)}
 
     @always_inline
+    fn __eq__(self, rhs: Self) -> Bool:
+        return self.value == rhs.value
+
+    @always_inline
     fn __neg__(self) -> Self:
         return Self {value: -self.value}
 
