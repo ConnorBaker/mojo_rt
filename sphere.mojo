@@ -15,7 +15,6 @@ from types import F
 struct Sphere:
     var center: Point3
     var radius: F
-    # var material: Material
 
     @always_inline
     fn hit(
@@ -25,24 +24,29 @@ struct Sphere:
         inout rec: HitRecord,
     ) -> Bool:
         let oc: Vec3 = r.origin - self.center
-        # TODO: Isn't r.direction.value.mag_sq() always 1.0?
-        let a: F = r.direction.value.mag_sq()
-        let half_b: F = oc.inner(r.direction.value)
+        # NOTE: The magnitude of the direction vector is always 1, so we can
+        # ignore a throughout when multiplying or dividing by it.
+        # let a: F = r.direction.value.mag_sq()
+        # NOTE: We use negative half_b throughout, so compute it here to use it later.
+        let neg_half_b: F = -oc.inner(r.direction.value)
         let c: F = oc.mag_sq() - pow(self.radius, 2)
-        let discriminant: F = pow(half_b, 2) - a * c
+        # This should be pow(half_b, 2), but the following is equivalent because squaring
+        # a negative number yields a positive number.
+        let discriminant: F = pow(neg_half_b, 2) - c  # * a, but a == 1
 
         if discriminant < 0.0:
             return False
 
-        # TODO: Factor out common constants like -half_b / a,
-        # rewrite with FMA, and use min/max chains with the bounds
-        # to avoid the branches.
         let sqrtd: F = sqrt(discriminant)
-        var root: F = (-half_b - sqrtd) / a
-        if not ray_t.surrounds(root):
-            root = (-half_b + sqrtd) / a
-            if not ray_t.surrounds(root):
-                return False
+        let root: F
+        let test_root_1: F = neg_half_b - sqrtd  # all divided by a, but a == 1
+        let test_root_2: F = neg_half_b + sqrtd  # all divided by a, but a == 1
+        if ray_t.surrounds(test_root_1):
+            root = test_root_1
+        elif ray_t.surrounds(test_root_2):
+            root = test_root_2
+        else:
+            return False
 
         rec.t = root
         rec.p = r[root]
