@@ -12,7 +12,6 @@ from viewport import ViewportConfig, Viewport
 
 fn main() raises -> None:
     seed(42)
-    alias dtype = DType.float64
     let renderer_config = RendererConfig(samples_per_pixel=2, use_lambertian=True)
     let renderer = Renderer(renderer_config)
     let viewport_config = ViewportConfig(image_width=1600)

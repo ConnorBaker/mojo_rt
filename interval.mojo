@@ -1,6 +1,6 @@
 from math import clamp
 from math.limit import neginf, inf
-from types import F, dtype, INF, NEGINF
+from types import F, DTYPE, INF, NEGINF
 
 
 @value
@@ -24,5 +24,5 @@ struct Interval:
         return self.min < x and x < self.max
 
     @always_inline
-    fn clamp[simd_width: Int](self, x: SIMD[dtype, simd_width]) -> SIMD[dtype, simd_width]:
-        return clamp[dtype, simd_width](x, self.min, self.max)
+    fn clamp[simd_width: Int](self, x: SIMD[DTYPE, simd_width]) -> SIMD[DTYPE, simd_width]:
+        return clamp[DTYPE, simd_width](x, self.min, self.max)

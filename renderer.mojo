@@ -5,7 +5,7 @@ from interval import Interval
 from ray3 import Ray3
 from unit3 import Unit3
 from vec3 import Vec3
-from types import F, dtype, INF
+from types import F, INF
 
 
 @value
