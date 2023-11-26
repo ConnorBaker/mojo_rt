@@ -76,16 +76,16 @@ struct ViewportConfig:
 struct Viewport:
     """Functions for the viewport."""
 
-    var config: ViewportConfig
-
+    @staticmethod
     @always_inline
-    fn get_pixel_center(self, x: Int, y: Int) -> Point3:
+    fn get_pixel_center(config: ViewportConfig, x: Int, y: Int) -> Point3:
         """Gets the center of the pixel at (x, y)."""
-        return self.config.loc_00.value + x * self.config.delta_u + y * self.config.delta_v
+        return config.loc_00.value + x * config.delta_u + y * config.delta_v
 
+    @staticmethod
     @always_inline
-    fn sample_pixel_square(self) -> Point3:
+    fn sample_pixel_square(config: ViewportConfig) -> Point3:
         """Returns a random point in the square surrounding a pixel at the origin."""
         let px: F = -0.5 * random_float64()
         let py: F = -0.5 * random_float64()
-        return px * self.config.delta_u + py * self.config.delta_v
+        return px * config.delta_u + py * config.delta_v

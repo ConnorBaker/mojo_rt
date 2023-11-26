@@ -46,24 +46,6 @@ struct RendererConfig:
 struct Renderer:
     """Functions for rendering."""
 
-    var config: RendererConfig
-
-    var get_diffuse_ray: fn (HitRecord) -> Ray3
-    """Function to get a diffuse ray from a hit record."""
-
-    @always_inline
-    fn __init__(config: RendererConfig) -> Self:
-        let get_diffuse_ray_fn: fn (HitRecord) -> Ray3
-        if config.use_lambertian:
-            get_diffuse_ray_fn = Self.get_diffuse_ray_lambertian
-        else:
-            get_diffuse_ray_fn = Self.get_diffuse_ray_uniform
-
-        return Self {
-            config: config,
-            get_diffuse_ray: get_diffuse_ray_fn,
-        }
-
     @staticmethod
     @always_inline
     fn get_diffuse_ray_uniform(rec: HitRecord) -> Ray3:

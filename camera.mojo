@@ -3,10 +3,10 @@ from hittable import HitRecord
 from hittable_list import HittableList
 from point3 import Point3
 from ray3 import Ray3
-from renderer import Renderer
+from renderer import Renderer, RendererConfig
 from unit3 import Unit3
 from vec3 import Vec3
-from viewport import Viewport
+from viewport import Viewport, ViewportConfig
 from types import F4
 
 
@@ -28,80 +28,74 @@ fn gradient_bg(r: Ray3) -> Color:
 
 @value
 @register_passable("trivial")
-struct Camera:
-    var renderer: Renderer
+struct CameraConfig:
+    var renderer: RendererConfig
+    var viewport: ViewportConfig
+
+
+@value
+@register_passable("trivial")
+struct Camera[config: CameraConfig]:
+    alias renderer: Renderer = Renderer()
     """Functions for rendering."""
-    var viewport: Viewport
+    alias viewport: Viewport = Viewport()
     """Functions for the viewport."""
 
-    var samples_per_pixel: Int
+    fn render(self, world: HittableList) -> InlinedFixedVector[Color]:
+        let ray_origin: Point3 = config.viewport.camera_center
+        var colors = InlinedFixedVector[Color](config.viewport.image_width * config.viewport.image_height)
 
-    @always_inline
-    fn __init__(
-        viewport: Viewport,
-        renderer: Renderer,
-        samples_per_pixel: Int,
-    ) -> Self:
-        return Self {
-            renderer: renderer,
-            viewport: viewport,
-            samples_per_pixel: samples_per_pixel,
-        }
+        for y in range(config.viewport.image_height):
+            print_no_newline("Scanlines remaining:", config.viewport.image_height - y, "\r")
+            for x in range(config.viewport.image_width):
+                let pixel_center: Point3 = self.viewport.get_pixel_center(config.viewport, x, y)
+                let pixel_color: Color
 
-    fn render(self, world: HittableList) raises -> None:
-        # Lift the branching out of the loop and select our pixel filter.
-        # NOTE: We cannot move this function to __init__ because it uses `self`.
-        # TODO: Cannot use self.renderer.config.samples_per_pixel here for some reason; only self.samples_per_pixel works.
-        let get_pixel_color_fn: fn (Point3, Point3, HittableList) capturing -> Color = (
-            self.pixel_box_filter if self.samples_per_pixel > 1 else self.pixel_no_filter
-        )
-        let ray_origin: Point3 = self.viewport.config.camera_center
+                @parameter
+                if config.renderer.samples_per_pixel > 1:
+                    pixel_color = self.pixel_box_filter(pixel_center, ray_origin, world)
+                else:
+                    pixel_color = self.pixel_no_filter(pixel_center, ray_origin, world)
 
-        with open("./simple.ppm", "w") as f:
-            f.write("P3\n")
-            f.write(String(self.viewport.config.image_width) + " " + self.viewport.config.image_height + "\n")
-            f.write("255\n")
+                colors.append(pixel_color)
 
-            for y in range(self.viewport.config.image_height):
-                print_no_newline("Scanlines remaining:", self.viewport.config.image_height - y, "\r")
-                for x in range(self.viewport.config.image_width):
-                    let pixel_center: Point3 = self.viewport.get_pixel_center(x, y)
-                    let pixel_color: Color = get_pixel_color_fn(pixel_center, ray_origin, world)
-                    pixel_color.write_color(
-                        # f, self.renderer_config.samples_per_pixel
-                        f,
-                        self.samples_per_pixel,
-                    )
-            print_no_newline("Scanlines remaining:", 0, "\r\n")
+        print_no_newline("Scanlines remaining:", 0, "\r\n")
         print("Done.")
 
-    # @always_inline
+        return colors
+
+    @always_inline
     fn ray_color(self, r: Ray3, world: HittableList) -> Color:
         var rec = HitRecord.bogus()
         var current_ray = r
         var current_depth = 0
         var light_attenuation = 1.0
 
-        while current_depth < self.renderer.config.max_depth and world.hit(
-            current_ray, self.renderer.config.hit_interval, rec
-        ):
-            current_ray = self.renderer.get_diffuse_ray(rec)
+        while current_depth < config.renderer.max_depth and world.hit(current_ray, config.renderer.hit_interval, rec):
+
+            @parameter
+            if config.renderer.use_lambertian:
+                current_ray = self.renderer.get_diffuse_ray_lambertian(rec)
+            else:
+                current_ray = self.renderer.get_diffuse_ray_uniform(rec)
+
             light_attenuation *= 0.5
             current_depth += 1
 
         # If we've exceeded the ray bounce limit, no more light is gathered
-        if current_depth >= self.renderer.config.max_depth:
+        if current_depth >= config.renderer.max_depth:
             return Color(0.0, 0.0, 0.0)
 
         # Otherwise, return the background color, attenuated by the light
         return light_attenuation * gradient_bg(current_ray).value
 
-    # TODO: Can we inline these functions while still referencing them as... pointers?
+    @always_inline
     fn pixel_no_filter(self, pixel_center: Point3, ray_origin: Point3, world: HittableList) -> Color:
         let ray_direction: Unit3 = (pixel_center - ray_origin).norm()
         let ray: Ray3 = Ray3(ray_origin, ray_direction)
         return self.ray_color(ray, world)
 
+    @always_inline
     fn pixel_box_filter(self, pixel_center: Point3, ray_origin: Point3, world: HittableList) -> Color:
         """
         Used when `samples_per_pixel` > 1.
@@ -109,9 +103,9 @@ struct Camera:
         See more: https://my.eng.utah.edu/~cs6965/slides/pathtrace.pdf.
         """
         var pixel_color = F4(0.0, 0.0, 0.0, 0.0)
-        for _ in range(self.renderer.config.samples_per_pixel):
+        for _ in range(config.renderer.samples_per_pixel):
             # Gets a randomly sampled camera ray for the pixel at (x, y).
-            let pixel_sample: Point3 = pixel_center.value + self.viewport.sample_pixel_square().value
+            let pixel_sample: Point3 = pixel_center.value + self.viewport.sample_pixel_square(config.viewport).value
             let ray_direction: Unit3 = (pixel_sample - ray_origin).norm()
             let ray: Ray3 = Ray3(ray_origin, ray_direction)
             pixel_color += self.ray_color(ray, world).value.value
