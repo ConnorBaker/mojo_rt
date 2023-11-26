@@ -1,14 +1,16 @@
 from point3 import Point3
 from unit3 import Unit3
 
+from types import F
+
 
 @value
 @register_passable("trivial")
-struct Ray3[dtype: DType]:
-    var origin: Point3[dtype]
-    var direction: Unit3[dtype]
+struct Ray3:
+    var origin: Point3
+    var direction: Unit3
 
-    fn __getitem__(self, t: SIMD[dtype, 1]) -> Point3[dtype]:
+    fn __getitem__(self, t: F) -> Point3:
         """
         Returns the point at the given distance along the ray.
         """

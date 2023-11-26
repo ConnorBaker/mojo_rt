@@ -8,19 +8,19 @@ from sphere import Sphere
 
 # TODO: This is monomorphic because we don't have traits yet.
 @value
-struct HittableList[dtype: DType]:
-    var value: DynamicVector[Sphere[dtype]]
+struct HittableList:
+    var value: DynamicVector[Sphere]
 
     @always_inline
     fn __init__(inout self) -> None:
-        self.value = DynamicVector[Sphere[dtype]]()
+        self.value = DynamicVector[Sphere]()
 
     @always_inline
     fn hit(
         self,
-        r: Ray3[dtype],
-        ray_t: Interval[dtype],
-        inout rec: HitRecord[dtype],
+        r: Ray3,
+        ray_t: Interval,
+        inout rec: HitRecord,
     ) -> Bool:
         var temp_rec = rec.__copy__()
         var hit_anything = False

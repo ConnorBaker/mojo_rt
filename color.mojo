@@ -2,20 +2,21 @@ from builtin import file
 
 from interval import Interval
 from vec3 import Vec3
+from types import F
 
 
 @value
 @register_passable("trivial")
-struct Color[dtype: DType]:
+struct Color:
     """A color in RGB space."""
 
-    var value: Vec3[dtype]
+    var value: Vec3
 
-    alias intensity_interval: Interval[dtype] = Interval[dtype](0.0, 1.0 - 1e-5)
+    alias intensity_interval: Interval = Interval(0.0, 1.0 - 1e-5)
 
     @always_inline
-    fn __init__(x: SIMD[dtype, 1], y: SIMD[dtype, 1], z: SIMD[dtype, 1]) -> Self:
-        return Self {value: Vec3[dtype](x, y, z)}
+    fn __init__(x: F, y: F, z: F) -> Self:
+        return Self {value: Vec3(x, y, z)}
 
     @always_inline
     fn sample_scale(self, samples_per_pixel: Int) -> Self:

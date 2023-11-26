@@ -2,11 +2,12 @@ from math import pow, rsqrt, sqrt
 from random import random_float64, randn_float64
 
 from unit3 import Unit3
+from types import F4, F
 
 
 @value
 @register_passable("trivial")
-struct Vec3[dtype: DType]:
+struct Vec3:
     """
     A 3D vector.
     """
@@ -22,20 +23,20 @@ struct Vec3[dtype: DType]:
     #
     # We take the second approach here, since it is more efficient.
 
-    var value: SIMD[dtype, 4]
+    var value: F4
 
     @always_inline
-    fn __init__(all: SIMD[dtype, 1]) -> Self:
-        let value = SIMD[dtype, 4](all, all, all, 0)
+    fn __init__(all: F) -> Self:
+        let value = F4(all, all, all, 0)
         return Self {value: value}
 
     @always_inline
-    fn __init__(x: SIMD[dtype, 1], y: SIMD[dtype, 1], z: SIMD[dtype, 1]) -> Self:
-        let value = SIMD[dtype, 4](x, y, z, 0)
+    fn __init__(x: F, y: F, z: F) -> Self:
+        let value = F4(x, y, z, 0)
         return Self {value: value}
 
     @always_inline
-    fn __init__(value: SIMD[dtype, 4]) -> Self:
+    fn __init__(value: F4) -> Self:
         var _value = value
         _value[3] = 0
         return Self {value: _value}
@@ -52,16 +53,16 @@ struct Vec3[dtype: DType]:
         return self.value + rhs.value
 
     @always_inline
-    fn __add__(self, rhs: SIMD[dtype, 1]) -> Self:
-        return self.value + SIMD[dtype, 4](rhs, rhs, rhs, 0)
+    fn __add__(self, rhs: F) -> Self:
+        return self.value + F4(rhs, rhs, rhs, 0)
 
     @always_inline
     fn __radd__(self, lhs: Self) -> Self:
         return lhs.value + self.value
 
     @always_inline
-    fn __radd__(self, lhs: SIMD[dtype, 1]) -> Self:
-        return SIMD[dtype, 4](lhs, lhs, lhs, 0) + self.value
+    fn __radd__(self, lhs: F) -> Self:
+        return F4(lhs, lhs, lhs, 0) + self.value
 
     @always_inline
     fn __sub__(self, rhs: Self) -> Self:
@@ -71,16 +72,16 @@ struct Vec3[dtype: DType]:
         return self.value - rhs.value
 
     @always_inline
-    fn __sub__(self, rhs: SIMD[dtype, 1]) -> Self:
-        return self.value - SIMD[dtype, 4](rhs, rhs, rhs, 0)
+    fn __sub__(self, rhs: F) -> Self:
+        return self.value - F4(rhs, rhs, rhs, 0)
 
     @always_inline
     fn __rsub__(self, lhs: Self) -> Self:
         return lhs.value - self.value
 
     @always_inline
-    fn __rsub__(self, lhs: SIMD[dtype, 1]) -> Self:
-        return SIMD[dtype, 4](lhs, lhs, lhs, 0) - self.value
+    fn __rsub__(self, lhs: F) -> Self:
+        return F4(lhs, lhs, lhs, 0) - self.value
 
     @always_inline
     fn __mul__(self, rhs: Self) -> Self:
@@ -90,7 +91,7 @@ struct Vec3[dtype: DType]:
         return self.value * rhs.value
 
     @always_inline
-    fn __mul__(self, rhs: SIMD[dtype, 1]) -> Self:
+    fn __mul__(self, rhs: F) -> Self:
         # Zero is a dominator for multiplication, so no need to broadcast
         # the rhs to a SIMD vector and zero the last component.
         # NOTE: Assumes RHS is not a special float value (e.g. NaN, Inf).
@@ -101,7 +102,7 @@ struct Vec3[dtype: DType]:
         return lhs.value * self.value
 
     @always_inline
-    fn __rmul__(self, lhs: SIMD[dtype, 1]) -> Self:
+    fn __rmul__(self, lhs: F) -> Self:
         return lhs * self.value
 
     @always_inline
@@ -110,34 +111,34 @@ struct Vec3[dtype: DType]:
         # divisor, then zero the last component of the result.
         # Since the lhs is a Vec3, we know the last component is zero, so the
         # result of the last component is also zero.
-        return self.value / (rhs.value + SIMD[dtype, 4](0.0, 0.0, 0.0, 1.0))
+        return self.value / (rhs.value + F4(0.0, 0.0, 0.0, 1.0))
 
     @always_inline
-    fn __truediv__(self, rhs: SIMD[dtype, 1]) -> Self:
+    fn __truediv__(self, rhs: F) -> Self:
         # Broadcast the rhs to a vector where the last component is one, then
         # perform the division.
-        return self.value / SIMD[dtype, 4](rhs, rhs, rhs, 1)
+        return self.value / F4(rhs, rhs, rhs, 1)
 
     @always_inline
     fn __rtruediv__(self, lhs: Self) -> Self:
-        return lhs.value / (self.value + SIMD[dtype, 4](0.0, 0.0, 0.0, 1.0))
+        return lhs.value / (self.value + F4(0.0, 0.0, 0.0, 1.0))
 
     @always_inline
-    fn __rtruediv__(self, lhs: SIMD[dtype, 1]) -> Self:
+    fn __rtruediv__(self, lhs: F) -> Self:
         # Cannot divide by zero, so we must broadcast the lhs to a SIMD vector
         # and manually zero the last component.
-        return SIMD[dtype, 4](lhs, lhs, lhs, 0) / (self.value + SIMD[dtype, 4](0.0, 0.0, 0.0, 1.0))
+        return F4(lhs, lhs, lhs, 0) / (self.value + F4(0.0, 0.0, 0.0, 1.0))
 
     @always_inline
     fn __neg__(self) -> Self:
         return -self.value
 
     @always_inline
-    fn __getitem__(self, idx: Int) -> SIMD[dtype, 1]:
+    fn __getitem__(self, idx: Int) -> F:
         return self.value[idx]
 
     @always_inline
-    fn inner(self, rhs: Self) -> SIMD[dtype, 1]:
+    fn inner(self, rhs: Self) -> F:
         return (self.value * rhs.value).reduce_add()
 
     @always_inline
@@ -150,18 +151,18 @@ struct Vec3[dtype: DType]:
         return crossed
 
     @always_inline
-    fn norm(self) -> Unit3[dtype]:
+    fn norm(self) -> Unit3:
         # Use construction via dictionary to avoid infinite recursion.
         let mag = self.mag()
         debug_assert(mag != 0.0, "Cannot normalize a zero vector.")
-        return Unit3[dtype] {value: self.value / mag}
+        return Unit3 {value: self.value / mag}
 
     @always_inline
-    fn mag_sq(self) -> SIMD[dtype, 1]:
+    fn mag_sq(self) -> F:
         return pow(self.value, 2).reduce_add()
 
     @always_inline
-    fn mag(self) -> SIMD[dtype, 1]:
+    fn mag(self) -> F:
         return sqrt(self.mag_sq())
 
     @always_inline
@@ -179,24 +180,20 @@ struct Vec3[dtype: DType]:
 
     @staticmethod
     @always_inline
-    fn rand(min: SIMD[dtype, 1] = 0.0, max: SIMD[dtype, 1] = 1.0) -> Self:
-        let min_f64 = min.cast[DType.float64]()
-        let max_f64 = max.cast[DType.float64]()
-        return SIMD[dtype, 4](
-            random_float64(min_f64, max_f64).cast[dtype](),
-            random_float64(min_f64, max_f64).cast[dtype](),
-            random_float64(min_f64, max_f64).cast[dtype](),
+    fn rand(min: F = 0.0, max: F = 1.0) -> Self:
+        return F4(
+            random_float64(min, max),
+            random_float64(min, max),
+            random_float64(min, max),
             0.0,
         )
 
     @staticmethod
     @always_inline
-    fn randn(mean: SIMD[dtype, 1] = 0.0, variance: SIMD[dtype, 1] = 1.0) -> Self:
-        let mean_f64 = mean.cast[DType.float64]()
-        let variance_f64 = variance.cast[DType.float64]()
-        return SIMD[dtype, 4](
-            randn_float64(mean_f64, variance_f64).cast[dtype](),
-            randn_float64(mean_f64, variance_f64).cast[dtype](),
-            randn_float64(mean_f64, variance_f64).cast[dtype](),
+    fn randn(mean: F = 0.0, variance: F = 1.0) -> Self:
+        return F4(
+            randn_float64(mean, variance),
+            randn_float64(mean, variance),
+            randn_float64(mean, variance),
             0.0,
         )

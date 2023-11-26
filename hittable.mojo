@@ -4,19 +4,20 @@ from point3 import Point3
 from ray3 import Ray3
 from unit3 import Unit3
 from vec3 import Vec3
+from types import F, dtype, NEGINF, INF
 
 
 @value
 @register_passable("trivial")
-struct HitRecord[dtype: DType]:
-    var p: Point3[dtype]
-    var normal: Unit3[dtype]
-    var t: SIMD[dtype, 1]
+struct HitRecord:
+    var p: Point3
+    var normal: Unit3
+    var t: F
     var front_face: Bool
 
     @always_inline
     fn __copy__(self) -> Self:
-        return HitRecord[dtype] {
+        return HitRecord {
             p: self.p,
             normal: self.normal,
             t: self.t,
@@ -26,16 +27,16 @@ struct HitRecord[dtype: DType]:
     @staticmethod
     @always_inline
     fn bogus() -> Self:
-        let neginf_vec3 = Vec3[dtype] {value: neginf[dtype]()}
-        return HitRecord[dtype] {
-            p: Point3[dtype] {value: neginf_vec3},
-            normal: Unit3[dtype] {value: neginf_vec3},
-            t: neginf[dtype](),
+        let neginf_vec3 = Vec3 {value: NEGINF}
+        return HitRecord {
+            p: Point3 {value: neginf_vec3},
+            normal: Unit3 {value: neginf_vec3},
+            t: NEGINF,
             front_face: False,
         }
 
     @always_inline
-    fn set_face_normal(inout self, r: Ray3[dtype], outward_normal: Unit3[dtype]) -> None:
+    fn set_face_normal(inout self, r: Ray3, outward_normal: Unit3) -> None:
         """
         Sets the normal of the hit record to the outward normal of the
         surface hit by the ray. The outward normal is the normal that
@@ -50,22 +51,22 @@ struct HitRecord[dtype: DType]:
         self.normal = outward_normal if self.front_face else -outward_normal
 
     @always_inline
-    fn get_ray_uniform(self) -> Ray3[dtype]:
+    fn get_ray_uniform(self) -> Ray3:
         """
         Gets a randomly sampled diffuse ray from the hit point.
         This is a uniform sampling.
         """
-        let diffuse_ray_direction = Unit3[dtype].random_on_unit_hemisphere(self.normal)
-        return Ray3[dtype](self.p, diffuse_ray_direction)
+        let diffuse_ray_direction = Unit3.random_on_unit_hemisphere(self.normal)
+        return Ray3(self.p, diffuse_ray_direction)
 
     @always_inline
-    fn get_ray_lambertian(self) -> Ray3[dtype]:
+    fn get_ray_lambertian(self) -> Ray3:
         """
         Gets a diffuse ray from the hit point using a non-uniform Lambertian sampling.
         """
         while True:
-            let diffuse_ray_vec: Vec3[dtype] = self.normal.value + Unit3[dtype].rand().value
+            let diffuse_ray_vec: Vec3 = self.normal.value + Unit3.rand().value
             let mag = diffuse_ray_vec.mag()
             if mag != 0.0:
-                let direction = Unit3[dtype] {value: diffuse_ray_vec / mag}
-                return Ray3[dtype](self.p, direction)
+                let direction = Unit3 {value: diffuse_ray_vec / mag}
+                return Ray3(self.p, direction)
