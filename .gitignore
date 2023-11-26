@@ -1,5 +1,5 @@
 .DS_Store
 *.png
-!simple.png
 main
 main.dSYM
+*.ppm
