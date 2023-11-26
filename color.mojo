@@ -3,6 +3,7 @@ from builtin import file
 from interval import Interval
 from vec3 import Vec3
 from types import F
+from camera import CameraConfig
 
 
 @value
@@ -15,7 +16,7 @@ struct Color:
     alias intensity_interval: Interval = Interval(0.0, 1.0 - 1e-5)
 
     @always_inline
-    fn __init__(x: F, y: F, z: F) -> Self:
+    fn __init__(x: F = 0.0, y: F = 0.0, z: F = 0.0) -> Self:
         return Self {value: Vec3(x, y, z)}
 
     @always_inline
@@ -29,8 +30,3 @@ struct Color:
     @always_inline
     fn to_int(self) -> SIMD[DType.uint8, 4]:
         return (256.0 * self.value.value).cast[DType.uint8]()
-
-    fn write_color(self, file: file.FileHandle, samples_per_pixel: Int) raises -> None:
-        let converted = self.sample_scale(samples_per_pixel).clamp().to_int()
-
-        file.write(String(converted[0]) + " " + converted[1] + " " + converted[2] + "\n")

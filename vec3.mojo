@@ -2,7 +2,7 @@ from math import pow, rsqrt, sqrt
 from random import random_float64, randn_float64
 
 from unit3 import Unit3
-from types import F4, F
+from types import F4, F, mk_F4, mk_F4_repeat
 
 
 @value
@@ -25,15 +25,21 @@ struct Vec3:
 
     var value: F4
 
+    alias _div_add_mask: F4 = mk_F4(w=1.0)
+    alias ZERO: Self = Self {value: mk_F4()}
+    alias ONE: Self = Self {value: mk_F4_repeat(1.0)}
+    alias I: Self = Self {value: mk_F4(x=1.0)}
+    alias J: Self = Self {value: mk_F4(y=1.0)}
+    alias K: Self = Self {value: mk_F4(z=1.0)}
+
+    @staticmethod
     @always_inline
-    fn __init__(all: F) -> Self:
-        let value = F4(all, all, all, 0)
-        return Self {value: value}
+    fn repeat(value: F) -> Self:
+        return Self {value: mk_F4_repeat(value)}
 
     @always_inline
-    fn __init__(x: F, y: F, z: F) -> Self:
-        let value = F4(x, y, z, 0)
-        return Self {value: value}
+    fn __init__(x: F = 0.0, y: F = 0.0, z: F = 0.0) -> Self:
+        return Self {value: mk_F4(x, y, z)}
 
     @always_inline
     fn __init__(value: F4) -> Self:
@@ -54,7 +60,7 @@ struct Vec3:
 
     @always_inline
     fn __add__(self, rhs: F) -> Self:
-        return self.value + F4(rhs, rhs, rhs, 0)
+        return self.value + mk_F4_repeat(rhs)
 
     @always_inline
     fn __radd__(self, lhs: Self) -> Self:
@@ -62,7 +68,7 @@ struct Vec3:
 
     @always_inline
     fn __radd__(self, lhs: F) -> Self:
-        return F4(lhs, lhs, lhs, 0) + self.value
+        return mk_F4_repeat(lhs) + self.value
 
     @always_inline
     fn __sub__(self, rhs: Self) -> Self:
@@ -73,7 +79,7 @@ struct Vec3:
 
     @always_inline
     fn __sub__(self, rhs: F) -> Self:
-        return self.value - F4(rhs, rhs, rhs, 0)
+        return self.value - mk_F4_repeat(rhs)
 
     @always_inline
     fn __rsub__(self, lhs: Self) -> Self:
@@ -81,7 +87,7 @@ struct Vec3:
 
     @always_inline
     fn __rsub__(self, lhs: F) -> Self:
-        return F4(lhs, lhs, lhs, 0) - self.value
+        return mk_F4_repeat(lhs) - self.value
 
     @always_inline
     fn __mul__(self, rhs: Self) -> Self:
@@ -111,7 +117,7 @@ struct Vec3:
         # divisor, then zero the last component of the result.
         # Since the lhs is a Vec3, we know the last component is zero, so the
         # result of the last component is also zero.
-        return self.value / (rhs.value + F4(0.0, 0.0, 0.0, 1.0))
+        return self.value / (rhs.value + self._div_add_mask)
 
     @always_inline
     fn __truediv__(self, rhs: F) -> Self:
@@ -121,13 +127,13 @@ struct Vec3:
 
     @always_inline
     fn __rtruediv__(self, lhs: Self) -> Self:
-        return lhs.value / (self.value + F4(0.0, 0.0, 0.0, 1.0))
+        return lhs.value / (self.value + self._div_add_mask)
 
     @always_inline
     fn __rtruediv__(self, lhs: F) -> Self:
         # Cannot divide by zero, so we must broadcast the lhs to a SIMD vector
         # and manually zero the last component.
-        return F4(lhs, lhs, lhs, 0) / (self.value + F4(0.0, 0.0, 0.0, 1.0))
+        return mk_F4_repeat(lhs) / (self.value + self._div_add_mask)
 
     @always_inline
     fn __neg__(self) -> Self:
@@ -136,6 +142,10 @@ struct Vec3:
     @always_inline
     fn __getitem__(self, idx: Int) -> F:
         return self.value[idx]
+
+    @always_inline
+    fn __setitem__(inout self, idx: Int, value: F):
+        self.value[idx] = value
 
     @always_inline
     fn inner(self, rhs: Self) -> F:
@@ -180,20 +190,20 @@ struct Vec3:
 
     @staticmethod
     @always_inline
-    fn rand(min: F = 0.0, max: F = 1.0) -> Self:
+    fn rand() -> Self:
         return F4(
-            random_float64(min, max),
-            random_float64(min, max),
-            random_float64(min, max),
+            random_float64(0.0, 1.0),
+            random_float64(0.0, 1.0),
+            random_float64(0.0, 1.0),
             0.0,
         )
 
     @staticmethod
     @always_inline
-    fn randn(mean: F = 0.0, variance: F = 1.0) -> Self:
+    fn randn() -> Self:
         return F4(
-            randn_float64(mean, variance),
-            randn_float64(mean, variance),
-            randn_float64(mean, variance),
+            randn_float64(0.0, 1.0),
+            randn_float64(0.0, 1.0),
+            randn_float64(0.0, 1.0),
             0.0,
         )

@@ -49,24 +49,3 @@ struct HitRecord:
         # for more details.
         self.front_face = r.direction.value.inner(outward_normal.value) < 0.0
         self.normal = outward_normal if self.front_face else -outward_normal
-
-    @always_inline
-    fn get_ray_uniform(self) -> Ray3:
-        """
-        Gets a randomly sampled diffuse ray from the hit point.
-        This is a uniform sampling.
-        """
-        let diffuse_ray_direction = Unit3.random_on_unit_hemisphere(self.normal)
-        return Ray3(self.p, diffuse_ray_direction)
-
-    @always_inline
-    fn get_ray_lambertian(self) -> Ray3:
-        """
-        Gets a diffuse ray from the hit point using a non-uniform Lambertian sampling.
-        """
-        while True:
-            let diffuse_ray_vec: Vec3 = self.normal.value + Unit3.rand().value
-            let mag = diffuse_ray_vec.mag()
-            if mag != 0.0:
-                let direction = Unit3 {value: diffuse_ray_vec / mag}
-                return Ray3(self.p, direction)

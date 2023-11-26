@@ -11,6 +11,10 @@ struct Unit3:
 
     var value: Vec3
 
+    alias I: Self = Self {value: Vec3.I}
+    alias J: Self = Self {value: Vec3.J}
+    alias K: Self = Self {value: Vec3.K}
+
     @always_inline
     fn __init__(x: F, y: F, z: F) -> Self:
         debug_assert(x != 0.0 or y != 0.0 or z != 0.0, "Cannot normalize the zero vector.")
@@ -30,11 +34,7 @@ struct Unit3:
     @always_inline
     fn rand() -> Self:
         """Generates a random unit vector in 3D space."""
-        while True:
-            let v = Vec3.rand()
-            let mag = v.mag()
-            if mag != 0.0:
-                return Unit3 {value: v / mag}
+        return Self.sample_while_mag_is_zero(Vec3.rand)
 
     @staticmethod
     @always_inline
@@ -45,8 +45,14 @@ struct Unit3:
 
         See: [How to generate random points on a sphere?](https://math.stackexchange.com/a/1585996)
         """
+        return Self.sample_while_mag_is_zero(Vec3.randn)
+
+    @staticmethod
+    @always_inline
+    fn sample_while_mag_is_zero(sample_fn: fn () -> Vec3) -> Self:
+        """Samples a unit vector in 3D space until it is not the zero vector."""
         while True:
-            let v = Vec3.randn()
+            let v = sample_fn()
             let mag = v.mag()
             if mag != 0.0:
                 return Unit3 {value: v / mag}

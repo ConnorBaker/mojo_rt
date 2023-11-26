@@ -10,8 +10,10 @@ struct Point3:
 
     var value: Vec3
 
+    alias ORIGIN: Self = Self {value: Vec3.ZERO}
+
     @always_inline
-    fn __init__(x: F, y: F, z: F) -> Self:
+    fn __init__(x: F = 0.0, y: F = 0.0, z: F = 0.0) -> Self:
         return Self {value: Vec3(x, y, z)}
 
     @always_inline

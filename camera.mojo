@@ -110,3 +110,17 @@ struct Camera[config: CameraConfig]:
             let ray: Ray3 = Ray3(ray_origin, ray_direction)
             pixel_color += self.ray_color(ray, world).value.value
         return Color {value: Vec3 {value: pixel_color}}
+
+    @staticmethod
+    fn write_render(owned pixels: InlinedFixedVector[Color]) raises -> None:
+        print("Writing render to file...")
+        with open("./simple.ppm", "w") as f:
+            f.write("P3\n")
+            f.write(String(config.viewport.image_width) + " " + config.viewport.image_height + "\n")
+            f.write("255\n")
+
+            for pixel in pixels:
+                let converted = pixel.sample_scale(config.renderer.samples_per_pixel).clamp().to_int()
+                f.write(String(converted[0]) + " " + converted[1] + " " + converted[2] + "\n")
+
+        print("Done.")

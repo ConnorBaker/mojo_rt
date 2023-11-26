@@ -38,26 +38,26 @@ struct ViewportConfig:
         https://raytracing.github.io/books/RayTracingInOneWeekend.html#rays,asimplecamera,andbackground/sendingraysintothescene.
         """
 
-        let image_height: Int = (image_width / aspect_ratio).to_int()
-        let camera_center = Point3(0.0, 0.0, 0.0)
+        let image_height = (image_width / aspect_ratio).to_int()
+        let camera_center = Point3.ORIGIN
 
         # Determine viewport dimensions
-        let focal_length: F = 1.0
-        let viewport_height: F = 2.0
-        let viewport_width: F = viewport_height * image_width / image_height
+        let focal_length = 1.0
+        let viewport_height = 2.0
+        let viewport_width = viewport_height * image_width / image_height
 
         # Calculate the vectors across the viewport edges
-        let viewport_u = Vec3(viewport_width, 0.0, 0.0)
-        let viewport_v = Vec3(0.0, -viewport_height, 0.0)
-        let viewport_avg: Vec3 = (viewport_u + viewport_v) / 2.0
+        let viewport_u = Vec3(x=viewport_width)
+        let viewport_v = Vec3(y=-viewport_height)
+        let viewport_avg = (viewport_u + viewport_v) / 2.0
 
         # Calculate the delta vectors from pixel to pixel
-        let delta_u: Vec3 = viewport_u / image_width
-        let delta_v: Vec3 = viewport_v / image_height
-        let delta_avg: Vec3 = (delta_u + delta_v) / 2.0
+        let delta_u = viewport_u / image_width
+        let delta_v = viewport_v / image_height
+        let delta_avg = (delta_u + delta_v) / 2.0
 
         # Calculate the location of the upper-left pixel
-        let viewport_upper_left: Point3 = camera_center - Point3(0.0, 0.0, focal_length) - viewport_avg
+        let viewport_upper_left: Point3 = camera_center - Point3(z=focal_length) - viewport_avg
         let loc_00: Point3 = viewport_upper_left.value + delta_avg
 
         return Self {
