@@ -1,4 +1,5 @@
-from hittable import HitRecord
+from hittable import Hittable
+from hit_record import HitRecord
 from interval import Interval
 from ray3 import Ray3
 from sphere import Sphere
@@ -7,13 +8,14 @@ from sphere import Sphere
 @value
 struct HittableList:
     # Workaround for not having a way to implement interfaces
-    var value: DynamicVector[fn (Ray3, Interval) capturing -> HitRecord]
+    var value: DynamicVector[Hittable]
 
-    @always_inline
     fn __init__(inout self) -> None:
-        self.value = DynamicVector[fn (Ray3, Interval) capturing -> HitRecord]()
+        self.value = DynamicVector[Hittable]()
 
-    @always_inline
+    fn add(inout self, h: Hittable) -> None:
+        self.value.push_back(h)
+
     fn hit(self, r: Ray3, ray_t: Interval) -> HitRecord:
         var rec = HitRecord.BOGUS
         var closest_so_far = ray_t.max

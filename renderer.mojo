@@ -26,7 +26,6 @@ struct RendererConfig:
     var use_lambertian: Bool
     """Whether to use Lambertian diffuse shading."""
 
-    @always_inline
     fn __init__(
         samples_per_pixel: Int = 10,
         max_depth: Int = 50,
@@ -47,7 +46,6 @@ struct Renderer:
     """Functions for rendering."""
 
     @staticmethod
-    @always_inline
     fn get_diffuse_ray_uniform(rec: HitRecord) -> Ray3:
         """
         Gets a randomly sampled diffuse ray from the hit point.
@@ -57,7 +55,6 @@ struct Renderer:
         return Ray3(rec.p, diffuse_ray_direction)
 
     @staticmethod
-    @always_inline
     fn get_diffuse_ray_lambertian(rec: HitRecord) -> Ray3:
         """
         Gets a diffuse ray from the hit point using a non-uniform Lambertian sampling.

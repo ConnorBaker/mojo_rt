@@ -28,7 +28,6 @@ struct ViewportConfig:
     var delta_v: Vec3
     """Change in location of the pixel in the v direction."""
 
-    @always_inline
     fn __init__(
         aspect_ratio: F = 16.0 / 9.0,
         image_width: Int = 400,
@@ -77,13 +76,11 @@ struct Viewport:
     """Functions for the viewport."""
 
     @staticmethod
-    @always_inline
     fn get_pixel_center(config: ViewportConfig, x: Int, y: Int) -> Point3:
         """Gets the center of the pixel at (x, y)."""
         return config.loc_00 + x * config.delta_u + y * config.delta_v
 
     @staticmethod
-    @always_inline
     fn sample_pixel_square(config: ViewportConfig) -> Point3:
         """Returns a random point in the square surrounding a pixel at the origin."""
         let px: F = -0.5 * random_float64()

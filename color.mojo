@@ -21,96 +21,73 @@ struct Color:
     alias BLACK: Self = Self {value: Vec3.repeat(0.0)}
     alias SKY_BLUE: Self = Self {value: Vec3(0.5, 0.7, 1.0)}
 
-    @always_inline
     fn __init__(x: F = 0.0, y: F = 0.0, z: F = 0.0) -> Self:
         return Self {value: Vec3(x, y, z)}
 
-    @always_inline
     fn __add__(self, rhs: F) -> Self:
         return Self {value: self.value + rhs}
 
-    @always_inline
     fn __add__(self, rhs: Self) -> Self:
         return Self {value: self.value + rhs.value}
 
-    @always_inline
     fn __radd__(self, lhs: F) -> Self:
         return Self {value: self.value + lhs}
 
-    @always_inline
     fn __radd__(self, lhs: Self) -> Self:
         return Self {value: self.value + lhs.value}
 
-    @always_inline
     fn __sub__(self, rhs: F) -> Self:
         return Self {value: self.value - rhs}
 
-    @always_inline
     fn __sub__(self, rhs: Self) -> Self:
         return Self {value: self.value - rhs.value}
 
-    @always_inline
     fn __rsub__(self, lhs: F) -> Self:
         return Self {value: lhs - self.value}
 
-    @always_inline
     fn __rsub__(self, lhs: Self) -> Self:
         return Self {value: lhs.value - self.value}
 
-    @always_inline
     fn __mul__(self, rhs: F) -> Self:
         return Self {value: self.value * rhs}
 
-    @always_inline
     fn __mul__(self, rhs: Self) -> Self:
         return Self {value: self.value * rhs.value}
 
-    @always_inline
     fn __rmul__(self, lhs: F) -> Self:
         return Self {value: self.value * lhs}
 
-    @always_inline
     fn __rmul__(self, lhs: Self) -> Self:
         return Self {value: self.value * lhs.value}
 
-    @always_inline
     fn __truediv__(self, rhs: F) -> Self:
         return Self {value: self.value / rhs}
 
-    @always_inline
     fn __truediv__(self, rhs: Self) -> Self:
         return Self {value: self.value / rhs.value}
 
-    @always_inline
     fn __rtruediv__(self, lhs: F) -> Self:
         return Self {value: lhs / self.value}
 
-    @always_inline
     fn __rtruediv__(self, lhs: Self) -> Self:
         return Self {value: lhs.value / self.value}
 
-    @always_inline
     fn sample_scale(self, samples_per_pixel: Int) -> Self:
         return self.value / samples_per_pixel
 
-    @always_inline
     fn clamp(self) -> Self:
         return Self {value: Self.INTENSITY_INTERVAL.clamp(self.value.value)}
 
-    @always_inline
     fn to_int(self) -> SIMD[DType.uint8, 4]:
         return (256.0 * self).value.value.cast[DType.uint8]()
 
-    @always_inline
     fn linear_to_gamma(self) -> Self:
         return Self {value: sqrt(self.value.value)}
 
-    @always_inline
     fn gamma_to_linear(self) -> Self:
         return Self {value: pow(self.value.value, 2)}
 
     @staticmethod
-    @always_inline
     fn sky_bg(r: Ray3) -> Color:
         """
         Returns a gradient background sky background color.

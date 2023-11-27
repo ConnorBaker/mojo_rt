@@ -43,7 +43,6 @@ struct Camera[config: CameraConfig]:
 
         return colors
 
-    @always_inline
     fn ray_color(self, r: Ray3, world: HittableList) -> Color:
         var rec = HitRecord.BOGUS
         var current_ray = r
@@ -71,13 +70,11 @@ struct Camera[config: CameraConfig]:
         # Otherwise, return the background color, attenuated by the light
         return light_attenuation * Color.sky_bg(current_ray)
 
-    @always_inline
     fn pixel_no_filter(self, pixel_center: Point3, ray_origin: Point3, world: HittableList) -> Color:
         let ray_direction: Unit3 = (pixel_center - ray_origin).norm()
         let ray: Ray3 = Ray3(ray_origin, ray_direction)
         return self.ray_color(ray, world)
 
-    @always_inline
     fn pixel_box_filter(self, pixel_center: Point3, ray_origin: Point3, world: HittableList) -> Color:
         """
         Used when `samples_per_pixel` > 1.
