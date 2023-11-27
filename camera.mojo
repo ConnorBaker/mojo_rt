@@ -101,5 +101,7 @@ struct Camera[config: CameraConfig]:
             f.write("255\n")
 
             for pixel in pixels:
-                let converted = pixel.sample_scale(Self.config.renderer.samples_per_pixel).clamp().to_int()
+                let converted = (
+                    pixel.sample_scale(Self.config.renderer.samples_per_pixel).linear_to_gamma().clamp().to_int()
+                )
                 f.write(String(converted[0]) + " " + converted[1] + " " + converted[2] + "\n")

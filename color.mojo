@@ -1,4 +1,5 @@
 from builtin import file
+from math import sqrt, pow
 
 from interval import Interval
 from vec3 import Vec3
@@ -99,6 +100,14 @@ struct Color:
     @always_inline
     fn to_int(self) -> SIMD[DType.uint8, 4]:
         return (256.0 * self).value.value.cast[DType.uint8]()
+
+    @always_inline
+    fn linear_to_gamma(self) -> Self:
+        return Self {value: sqrt(self.value.value)}
+
+    @always_inline
+    fn gamma_to_linear(self) -> Self:
+        return Self {value: pow(self.value.value, 2)}
 
     @staticmethod
     @always_inline
