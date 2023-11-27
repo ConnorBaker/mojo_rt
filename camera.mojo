@@ -7,7 +7,7 @@ from renderer import Renderer, RendererConfig
 from unit3 import Unit3
 from vec3 import Vec3
 from viewport import Viewport, ViewportConfig
-from types import F4
+from types import F4, mk_F4
 
 
 @value
@@ -84,7 +84,7 @@ struct Camera[config: CameraConfig]:
         This is a box filter.
         See more: https://my.eng.utah.edu/~cs6965/slides/pathtrace.pdf.
         """
-        var pixel_color = F4(0.0, 0.0, 0.0, 0.0)
+        var pixel_color = mk_F4()
         for _ in range(config.renderer.samples_per_pixel):
             # Gets a randomly sampled camera ray for the pixel at (x, y).
             let pixel_sample: Point3 = pixel_center.value + self.viewport.sample_pixel_square(config.viewport).value

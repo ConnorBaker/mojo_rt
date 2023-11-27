@@ -15,9 +15,10 @@ fn setup_world() -> HittableList:
     let green_horizon = Sphere(Point3(y=-100.5, z=-1.0), 100.0)
     let normal_mapped_sphere = Sphere(Point3(z=-1.0), 0.5)
 
+    # TODO: Replace with InlinedFixedVector
     var world = HittableList()
-    world.value.push_back(green_horizon)
-    world.value.push_back(normal_mapped_sphere)
+    world.value.push_back(green_horizon.hit())
+    world.value.push_back(normal_mapped_sphere.hit())
 
     return world
 
