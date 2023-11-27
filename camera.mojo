@@ -26,15 +26,15 @@ struct Camera[config: CameraConfig]:
     """Functions for the viewport."""
 
     fn render(self, world: HittableList) -> InlinedFixedVector[Color]:
-        let ray_origin: Point3 = config.viewport.camera_center
-        var colors = InlinedFixedVector[Color](config.viewport.image_width * config.viewport.image_height)
-        for y in range(config.viewport.image_height):
-            for x in range(config.viewport.image_width):
-                let pixel_center: Point3 = self.viewport.get_pixel_center(config.viewport, x, y)
+        let ray_origin: Point3 = Self.config.viewport.camera_center
+        var colors = InlinedFixedVector[Color](Self.config.viewport.image_width * Self.config.viewport.image_height)
+        for y in range(Self.config.viewport.image_height):
+            for x in range(Self.config.viewport.image_width):
+                let pixel_center: Point3 = self.viewport.get_pixel_center(Self.config.viewport, x, y)
                 let pixel_color: Color
 
                 @parameter
-                if config.renderer.samples_per_pixel > 1:
+                if Self.config.renderer.samples_per_pixel > 1:
                     pixel_color = self.pixel_box_filter(pixel_center, ray_origin, world)
                 else:
                     pixel_color = self.pixel_no_filter(pixel_center, ray_origin, world)
@@ -50,13 +50,13 @@ struct Camera[config: CameraConfig]:
         var current_depth = 0
         var light_attenuation = 1.0
 
-        while current_depth < config.renderer.max_depth:
-            rec = world.hit(current_ray, config.renderer.hit_interval)
+        while current_depth < Self.config.renderer.max_depth:
+            rec = world.hit(current_ray, Self.config.renderer.hit_interval)
             if rec.is_bogus():
                 break
 
             @parameter
-            if config.renderer.use_lambertian:
+            if Self.config.renderer.use_lambertian:
                 current_ray = self.renderer.get_diffuse_ray_lambertian(rec)
             else:
                 current_ray = self.renderer.get_diffuse_ray_uniform(rec)
@@ -65,11 +65,11 @@ struct Camera[config: CameraConfig]:
             current_depth += 1
 
         # If we've exceeded the ray bounce limit, no more light is gathered
-        if current_depth >= config.renderer.max_depth:
+        if current_depth >= Self.config.renderer.max_depth:
             return Color.BLACK
 
         # Otherwise, return the background color, attenuated by the light
-        return light_attenuation * Color.sky_bg(current_ray).value
+        return light_attenuation * Color.sky_bg(current_ray)
 
     @always_inline
     fn pixel_no_filter(self, pixel_center: Point3, ray_origin: Point3, world: HittableList) -> Color:
@@ -84,22 +84,22 @@ struct Camera[config: CameraConfig]:
         This is a box filter.
         See more: https://my.eng.utah.edu/~cs6965/slides/pathtrace.pdf.
         """
-        var pixel_color = mk_F4()
-        for _ in range(config.renderer.samples_per_pixel):
+        var pixel_color = Color.BLACK
+        for _ in range(Self.config.renderer.samples_per_pixel):
             # Gets a randomly sampled camera ray for the pixel at (x, y).
-            let pixel_sample: Point3 = pixel_center.value + self.viewport.sample_pixel_square(config.viewport).value
+            let pixel_sample: Point3 = pixel_center + self.viewport.sample_pixel_square(Self.config.viewport)
             let ray_direction: Unit3 = (pixel_sample - ray_origin).norm()
             let ray: Ray3 = Ray3(ray_origin, ray_direction)
-            pixel_color += self.ray_color(ray, world).value.value
-        return Color {value: Vec3 {value: pixel_color}}
+            pixel_color = self.ray_color(ray, world) + pixel_color
+        return pixel_color
 
     @staticmethod
     fn write_render(owned pixels: InlinedFixedVector[Color]) raises -> None:
         with open("./simple.ppm", "w") as f:
             f.write("P3\n")
-            f.write(String(config.viewport.image_width) + " " + config.viewport.image_height + "\n")
+            f.write(String(Self.config.viewport.image_width) + " " + Self.config.viewport.image_height + "\n")
             f.write("255\n")
 
             for pixel in pixels:
-                let converted = pixel.sample_scale(config.renderer.samples_per_pixel).clamp().to_int()
+                let converted = pixel.sample_scale(Self.config.renderer.samples_per_pixel).clamp().to_int()
                 f.write(String(converted[0]) + " " + converted[1] + " " + converted[2] + "\n")

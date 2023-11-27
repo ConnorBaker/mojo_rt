@@ -22,7 +22,10 @@ struct Unit3:
 
     @always_inline
     fn __init__(value: Vec3) -> Self:
-        debug_assert(value[0] != 0.0 or value[1] != 0.0 or value[2] != 0.0, "Cannot normalize the zero vector.")
+        debug_assert(
+            value[0] != 0.0 or value[1] != 0.0 or value[2] != 0.0,
+            "Cannot normalize the zero vector.",
+        )
         return value.norm()
 
     @always_inline
@@ -33,6 +36,82 @@ struct Unit3:
     fn __neg__(self) -> Self:
         # Negation does not change the magnitude of the vector.
         return Unit3 {value: -self.value}
+
+    @always_inline
+    fn __add__(self, rhs: Self) -> Vec3:
+        return self.value + rhs.value
+
+    @always_inline
+    fn __add__(self, rhs: Vec3) -> Vec3:
+        return self.value + rhs
+
+    @always_inline
+    fn __add__(self, rhs: F) -> Vec3:
+        return self.value + rhs
+
+    @always_inline
+    fn __radd__(self, lhs: Self) -> Vec3:
+        return lhs.value + self.value
+
+    @always_inline
+    fn __radd__(self, lhs: Vec3) -> Vec3:
+        return lhs + self.value
+
+    @always_inline
+    fn __radd__(self, lhs: F) -> Vec3:
+        return lhs + self.value
+
+    @always_inline
+    fn __sub__(self, rhs: Self) -> Vec3:
+        return self.value - rhs.value
+
+    @always_inline
+    fn __sub__(self, rhs: Vec3) -> Vec3:
+        return self.value - rhs
+
+    @always_inline
+    fn __sub__(self, rhs: F) -> Vec3:
+        return self.value - rhs
+
+    @always_inline
+    fn __rsub__(self, lhs: Self) -> Vec3:
+        return lhs.value - self.value
+
+    @always_inline
+    fn __rsub__(self, lhs: Vec3) -> Vec3:
+        return lhs - self.value
+
+    @always_inline
+    fn __rsub__(self, lhs: F) -> Vec3:
+        return lhs - self.value
+
+    @always_inline
+    fn __mul__(self, rhs: Self) -> Vec3:
+        return self.value * rhs.value
+
+    @always_inline
+    fn __mul__(self, rhs: Vec3) -> Vec3:
+        return self.value * rhs
+
+    @always_inline
+    fn __mul__(self, rhs: F) -> Vec3:
+        return self.value * rhs
+
+    @always_inline
+    fn __rmul__(self, lhs: Self) -> Vec3:
+        return lhs.value * self.value
+
+    @always_inline
+    fn __rmul__(self, lhs: Vec3) -> Vec3:
+        return lhs * self.value
+
+    @always_inline
+    fn __rmul__(self, lhs: F) -> Vec3:
+        return lhs * self.value
+
+    @always_inline
+    fn inner(self, rhs: Self) -> F:
+        return (self.value * rhs.value).value.reduce_add()
 
     @staticmethod
     @always_inline

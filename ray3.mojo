@@ -14,4 +14,4 @@ struct Ray3:
         """
         Returns the point at the given distance along the ray.
         """
-        return self.origin.value + self.direction.value * t
+        return self.origin + self.direction * t

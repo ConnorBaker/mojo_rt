@@ -25,6 +25,14 @@ struct Point3:
         return Self {value: -self.value}
 
     @always_inline
+    fn __add__(self, rhs: Self) -> Self:
+        return Self {value: self.value + rhs.value}
+
+    @always_inline
+    fn __radd__(self, lhs: Self) -> Self:
+        return Self {value: lhs.value + self.value}
+
+    @always_inline
     fn __sub__(self, rhs: Self) -> Vec3:
         return self.value - rhs.value
 

@@ -106,7 +106,7 @@ struct Vec3:
         # divisor, then zero the last component of the result.
         # Since the lhs is a Vec3, we know the last component is zero, so the
         # result of the last component is also zero.
-        return self.value / (rhs.value + self._div_add_mask)
+        return self.value / (rhs.value + Self._div_add_mask)
 
     @always_inline
     fn __truediv__(self, rhs: F) -> Self:
@@ -116,13 +116,13 @@ struct Vec3:
 
     @always_inline
     fn __rtruediv__(self, lhs: Self) -> Self:
-        return lhs.value / (self.value + self._div_add_mask)
+        return lhs.value / (self.value + Self._div_add_mask)
 
     @always_inline
     fn __rtruediv__(self, lhs: F) -> Self:
         # Cannot divide by zero, so we must broadcast the lhs to a SIMD vector
         # and manually zero the last component.
-        return mk_F4_repeat(lhs) / (self.value + self._div_add_mask)
+        return mk_F4_repeat(lhs) / (self.value + Self._div_add_mask)
 
     @always_inline
     fn __neg__(self) -> Self:

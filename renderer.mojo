@@ -63,7 +63,7 @@ struct Renderer:
         Gets a diffuse ray from the hit point using a non-uniform Lambertian sampling.
         """
         while True:
-            let diffuse_ray_vec: Vec3 = rec.normal.value + Unit3.rand().value
+            let diffuse_ray_vec: Vec3 = rec.normal + Unit3.rand()
             let mag = diffuse_ray_vec.mag()
             if mag != 0.0:
                 let direction = Unit3 {value: diffuse_ray_vec / mag}

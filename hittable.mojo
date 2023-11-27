@@ -1,10 +1,8 @@
-from math.limit import neginf
-
 from point3 import Point3
 from ray3 import Ray3
 from unit3 import Unit3
 from vec3 import Vec3
-from types import F, NEGINF, INF
+from types import F, INF
 
 
 @value
@@ -16,9 +14,9 @@ struct HitRecord:
     var front_face: Bool
 
     alias BOGUS: Self = Self {
-        p: Point3 {value: Vec3 {value: NEGINF}},
-        normal: Unit3 {value: Vec3 {value: NEGINF}},
-        t: NEGINF,
+        p: Point3 {value: Vec3 {value: INF}},
+        normal: Unit3 {value: Vec3 {value: INF}},
+        t: INF,
         front_face: False,
     }
 
@@ -34,7 +32,7 @@ struct HitRecord:
         # do it when coloring the surface. See
         # https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces
         # for more details.
-        let front_face = r.direction.value.inner(outward_normal.value) < 0.0
+        let front_face = r.direction.inner(outward_normal) < 0.0
         let normal = outward_normal if front_face else -outward_normal
         return Self {p: p, normal: normal, t: t, front_face: front_face}
 

@@ -25,6 +25,70 @@ struct Color:
         return Self {value: Vec3(x, y, z)}
 
     @always_inline
+    fn __add__(self, rhs: F) -> Self:
+        return Self {value: self.value + rhs}
+
+    @always_inline
+    fn __add__(self, rhs: Self) -> Self:
+        return Self {value: self.value + rhs.value}
+
+    @always_inline
+    fn __radd__(self, lhs: F) -> Self:
+        return Self {value: self.value + lhs}
+
+    @always_inline
+    fn __radd__(self, lhs: Self) -> Self:
+        return Self {value: self.value + lhs.value}
+
+    @always_inline
+    fn __sub__(self, rhs: F) -> Self:
+        return Self {value: self.value - rhs}
+
+    @always_inline
+    fn __sub__(self, rhs: Self) -> Self:
+        return Self {value: self.value - rhs.value}
+
+    @always_inline
+    fn __rsub__(self, lhs: F) -> Self:
+        return Self {value: lhs - self.value}
+
+    @always_inline
+    fn __rsub__(self, lhs: Self) -> Self:
+        return Self {value: lhs.value - self.value}
+
+    @always_inline
+    fn __mul__(self, rhs: F) -> Self:
+        return Self {value: self.value * rhs}
+
+    @always_inline
+    fn __mul__(self, rhs: Self) -> Self:
+        return Self {value: self.value * rhs.value}
+
+    @always_inline
+    fn __rmul__(self, lhs: F) -> Self:
+        return Self {value: self.value * lhs}
+
+    @always_inline
+    fn __rmul__(self, lhs: Self) -> Self:
+        return Self {value: self.value * lhs.value}
+
+    @always_inline
+    fn __truediv__(self, rhs: F) -> Self:
+        return Self {value: self.value / rhs}
+
+    @always_inline
+    fn __truediv__(self, rhs: Self) -> Self:
+        return Self {value: self.value / rhs.value}
+
+    @always_inline
+    fn __rtruediv__(self, lhs: F) -> Self:
+        return Self {value: lhs / self.value}
+
+    @always_inline
+    fn __rtruediv__(self, lhs: Self) -> Self:
+        return Self {value: lhs.value / self.value}
+
+    @always_inline
     fn sample_scale(self, samples_per_pixel: Int) -> Self:
         return self.value / samples_per_pixel
 
@@ -34,7 +98,7 @@ struct Color:
 
     @always_inline
     fn to_int(self) -> SIMD[DType.uint8, 4]:
-        return (256.0 * self.value.value).cast[DType.uint8]()
+        return (256.0 * self).value.value.cast[DType.uint8]()
 
     @staticmethod
     @always_inline
@@ -47,5 +111,5 @@ struct Color:
         """
         let unit_direction: Unit3 = r.direction
         let a = 0.5 * (unit_direction.value[1] + 1.0)
-        let gradient = (1.0 - a) * Color.WHITE.value + a * Color.SKY_BLUE.value
+        let gradient = (1.0 - a) * Color.WHITE + a * Color.SKY_BLUE
         return gradient

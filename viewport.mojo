@@ -58,7 +58,7 @@ struct ViewportConfig:
 
         # Calculate the location of the upper-left pixel
         let viewport_upper_left: Point3 = camera_center - Point3(z=focal_length) - viewport_avg
-        let loc_00: Point3 = viewport_upper_left.value + delta_avg
+        let loc_00: Point3 = viewport_upper_left + delta_avg
 
         return Self {
             aspect_ratio: aspect_ratio,
@@ -80,7 +80,7 @@ struct Viewport:
     @always_inline
     fn get_pixel_center(config: ViewportConfig, x: Int, y: Int) -> Point3:
         """Gets the center of the pixel at (x, y)."""
-        return config.loc_00.value + x * config.delta_u + y * config.delta_v
+        return config.loc_00 + x * config.delta_u + y * config.delta_v
 
     @staticmethod
     @always_inline
