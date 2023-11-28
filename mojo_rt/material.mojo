@@ -22,8 +22,8 @@ alias Material = fn (
 struct Lambertian:
     var albedo: Color
 
-    fn scatter(self) -> Material:
-        fn _scatter(r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
+    fn get_material(self) -> Material:
+        fn scatter(r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
             let scatter_direction: Vec3 = rec.normal + Unit3.rand()
             let scatter_direction_mag = scatter_direction.mag()
             let scatter_direction_unit: Unit3
@@ -38,7 +38,7 @@ struct Lambertian:
             let attenuation = self.albedo
             return (did_scatter, attenuation, scattered)
 
-        return _scatter
+        return scatter
 
 
 @value
@@ -46,8 +46,8 @@ struct Lambertian:
 struct Metal:
     var albedo: Color
 
-    fn scatter(self) -> Material:
-        fn _scatter(r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
+    fn get_material(self) -> Material:
+        fn scatter(r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
             """
             Gets a reflected ray from the hit point.
             """
@@ -57,4 +57,4 @@ struct Metal:
             let attenuation = self.albedo
             return (did_scatter, attenuation, scattered)
 
-        return _scatter
+        return scatter

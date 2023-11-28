@@ -18,8 +18,8 @@ struct Sphere:
     var center: Point3
     var radius: F
 
-    fn hit(self) -> Hittable:
-        fn _hit(r: Ray3, ray_t: Interval, /) -> HitRecord:
+    fn get_hittable(self) -> Hittable:
+        fn hit(r: Ray3, ray_t: Interval, /) -> HitRecord:
             """
             Return a hit record for the given ray, if it hits the sphere. If not,
             return HitRecord.BOGUS.
@@ -59,4 +59,4 @@ struct Sphere:
             let outward_normal: Unit3 = Unit3 {value: (p - self.center) / self.radius}
             return HitRecord(p, t, r, outward_normal)
 
-        return _hit
+        return hit

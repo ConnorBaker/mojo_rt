@@ -10,12 +10,9 @@ from mojo_rt.viewport import ViewportConfig, Viewport
 
 
 fn setup_world() -> HittableList:
-    let green_horizon: Hittable = Sphere(Point3(y=-100.5, z=-1.0), 100.0).hit()
-    let normal_mapped_sphere: Hittable = Sphere(Point3(z=-1.0), 0.5).hit()
-
     var world = HittableList()
-    world.add(green_horizon)
-    world.add(normal_mapped_sphere)
+    world.add(Sphere(Point3(y=-100.5, z=-1.0), 100.0).get_hittable())
+    world.add(Sphere(Point3(z=-1.0), 0.5).get_hittable())
 
     return world
 
