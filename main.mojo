@@ -1,8 +1,10 @@
 from random import seed
 
 from mojo_rt.camera import Camera, CameraConfig
+from mojo_rt.color import Color
 from mojo_rt.hittable import Hittable
 from mojo_rt.hittable_list import HittableList
+from mojo_rt.material import Lambertian, Material
 from mojo_rt.point3 import Point3
 from mojo_rt.renderer import RendererConfig, Renderer
 from mojo_rt.sphere import Sphere
@@ -10,9 +12,18 @@ from mojo_rt.viewport import ViewportConfig, Viewport
 
 
 fn setup_world() -> HittableList:
+    # Materials
+    let material_ground: Material = Lambertian(Color(0.8, 0.8, 0.0)).get_material()
+    let material_center: Material = Lambertian(Color(0.1, 0.2, 0.5)).get_material()
+
+    # Hittables
+    let ground_sphere: Hittable = Sphere(Point3(y=-100.5, z=-1.0), 100.0, material_ground).get_hittable()
+    let center_sphere: Hittable = Sphere(Point3(z=-1.0), 0.5, material_center).get_hittable()
+
+    # World
     var world = HittableList()
-    world.add(Sphere(Point3(y=-100.5, z=-1.0), 100.0).get_hittable())
-    world.add(Sphere(Point3(z=-1.0), 0.5).get_hittable())
+    world.add(ground_sphere)
+    world.add(center_sphere)
 
     return world
 

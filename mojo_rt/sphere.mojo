@@ -3,6 +3,7 @@ from math import sqrt, pow
 from .hit_record import HitRecord
 from .hittable import Hittable
 from .interval import Interval
+from .material import Material
 from .point3 import Point3
 from .ray3 import Ray3
 from .types import F
@@ -17,6 +18,7 @@ struct Sphere:
 
     var center: Point3
     var radius: F
+    var material: Material
 
     fn get_hittable(self) -> Hittable:
         fn hit(r: Ray3, ray_t: Interval, /) -> HitRecord:
@@ -57,6 +59,6 @@ struct Sphere:
             # NOTE: We use Unit3's dict constructor here to avoid a redundant sqrt in
             # the __init__ constructor which calculates the magnitude.
             let outward_normal: Unit3 = Unit3 {value: (p - self.center) / self.radius}
-            return HitRecord(p, t, r, outward_normal)
+            return HitRecord(p, t, r, outward_normal, self.material)
 
         return hit
