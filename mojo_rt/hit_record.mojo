@@ -1,17 +1,23 @@
-from point3 import Point3
-from ray3 import Ray3
-from unit3 import Unit3
-from vec3 import Vec3
-from types import F, INF
+from .point3 import Point3
+from .ray3 import Ray3
+from .types import F, INF
+from .unit3 import Unit3
+from .vec3 import Vec3
 
 
 @value
 @register_passable("trivial")
 struct HitRecord:
+    """A record of a ray hitting a surface."""
+
     var p: Point3
+    """The point at which the ray hit the surface."""
     var normal: Unit3
+    """The normal of the surface at the point of intersection."""
     var t: F
+    """The length of the ray at the point of intersection."""
     var front_face: Bool
+    """Whether the ray hit the front or the back of the surface."""
 
     alias BOGUS: Self = Self {
         p: Point3 {value: Vec3 {value: INF}},
@@ -19,6 +25,7 @@ struct HitRecord:
         t: INF,
         front_face: False,
     }
+    """A bogus hit record."""
 
     fn __init__(p: Point3, t: F, r: Ray3, outward_normal: Unit3) -> HitRecord:
         """

@@ -1,11 +1,9 @@
-from math.limit import inf
-
-from hittable import HitRecord
-from interval import Interval
-from ray3 import Ray3
-from unit3 import Unit3
-from vec3 import Vec3
-from types import F, INF
+from .hit_record import HitRecord
+from .interval import Interval
+from .ray3 import Ray3
+from .types import F, INF
+from .unit3 import Unit3
+from .vec3 import Vec3
 
 
 @value

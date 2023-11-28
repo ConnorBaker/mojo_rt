@@ -1,11 +1,13 @@
 from math import clamp
-from math.limit import neginf, inf
-from types import F, DTYPE, INF, NEGINF
+
+from .types import F, DTYPE, INF, NEGINF
 
 
 @value
 @register_passable("trivial")
 struct Interval:
+    """A closed interval of numbers."""
+
     var min: F
     var max: F
 
@@ -21,4 +23,5 @@ struct Interval:
         return self.min < x and x < self.max
 
     fn clamp[simd_width: Int](self, x: SIMD[DTYPE, simd_width]) -> SIMD[DTYPE, simd_width]:
+        """Clamps x to the interval."""
         return clamp[DTYPE, simd_width](x, self.min, self.max)

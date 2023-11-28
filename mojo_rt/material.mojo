@@ -1,12 +1,11 @@
 from math import isclose
 
-from hittable import HitRecord
-from ray3 import Ray3
-from color import Color
-from types import F, INF
-from unit3 import Unit3
-from vec3 import Vec3
-from point3 import Point3
+from .color import Color
+from .hit_record import HitRecord
+from .ray3 import Ray3
+from .types import F, INF
+from .unit3 import Unit3
+from .vec3 import Vec3
 
 alias Material = fn (
     Ray3,  # Ray in
@@ -48,7 +47,7 @@ struct Metal:
         """
         Gets a reflected ray from the hit point.
         """
-        let reflected: Unit3 = r_in.direction.reflect(rec.normal).norm()
+        let reflected: Unit3 = Unit3(r_in.direction.reflect(rec.normal))
         let scattered = Ray3(rec.p, reflected)
         let did_scatter = True
         let attenuation = self.albedo

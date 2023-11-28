@@ -1,9 +1,8 @@
 from random import random_float64
 
-from point3 import Point3
-from vec3 import Vec3
-
-from types import F
+from .point3 import Point3
+from .types import F
+from .vec3 import Vec3
 
 
 @value

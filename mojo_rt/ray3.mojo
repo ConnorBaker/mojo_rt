@@ -1,12 +1,13 @@
-from point3 import Point3
-from unit3 import Unit3
-
-from types import F
+from .point3 import Point3
+from .types import F
+from .unit3 import Unit3
 
 
 @value
 @register_passable("trivial")
 struct Ray3:
+    """A ray in 3D space."""
+
     var origin: Point3
     var direction: Unit3
 

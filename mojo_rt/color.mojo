@@ -1,12 +1,10 @@
-from builtin import file
 from math import sqrt, pow
 
-from interval import Interval
-from vec3 import Vec3
-from types import F
-from camera import CameraConfig
-from ray3 import Ray3
-from unit3 import Unit3
+from .interval import Interval
+from .ray3 import Ray3
+from .types import F
+from .unit3 import Unit3
+from .vec3 import Vec3
 
 
 @value
@@ -17,12 +15,20 @@ struct Color:
     var value: Vec3
 
     alias INTENSITY_INTERVAL: Interval = Interval(0.0, 1.0 - 1e-5)
-    alias WHITE: Self = Self {value: Vec3.repeat(1.0)}
-    alias BLACK: Self = Self {value: Vec3.repeat(0.0)}
-    alias SKY_BLUE: Self = Self {value: Vec3(0.5, 0.7, 1.0)}
+    """The interval of valid color intensities."""
+
+    alias BLACK: Self = Self(0.0, 0.0, 0.0)
+    """The color black."""
+    alias WHITE: Self = Self(1.0, 1.0, 1.0)
+    """The color white."""
+    alias SKY_BLUE: Self = Self(0.5, 0.7, 1.0)
+    """The color of the sky."""
 
     fn __init__(x: F = 0.0, y: F = 0.0, z: F = 0.0) -> Self:
         return Self {value: Vec3(x, y, z)}
+
+    fn __init__(value: Vec3) -> Self:
+        return Self {value: value}
 
     fn __add__(self, rhs: F) -> Self:
         return Self {value: self.value + rhs}
@@ -71,9 +77,6 @@ struct Color:
 
     fn __rtruediv__(self, lhs: Self) -> Self:
         return Self {value: lhs.value / self.value}
-
-    fn sample_scale(self, samples_per_pixel: Int) -> Self:
-        return self.value / samples_per_pixel
 
     fn clamp(self) -> Self:
         return Self {value: Self.INTENSITY_INTERVAL.clamp(self.value.value)}

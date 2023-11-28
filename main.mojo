@@ -1,14 +1,11 @@
 from random import seed
 
-from camera import Camera, CameraConfig
-from hittable_list import HittableList
-from point3 import Point3
-from renderer import RendererConfig, Renderer
-from sphere import Sphere
-from unit3 import Unit3
-from vec3 import Vec3
-from viewport import ViewportConfig, Viewport
-from color import Color
+from mojo_rt.camera import Camera, CameraConfig
+from mojo_rt.hittable_list import HittableList
+from mojo_rt.point3 import Point3
+from mojo_rt.renderer import RendererConfig, Renderer
+from mojo_rt.sphere import Sphere
+from mojo_rt.viewport import ViewportConfig, Viewport
 
 
 fn setup_world() -> HittableList:

@@ -1,7 +1,5 @@
-from interval import Interval
-from vec3 import Vec3
-
-from types import F, F4
+from .types import F, mk_F4
+from .vec3 import Vec3
 
 
 @value
@@ -11,20 +9,22 @@ struct Unit3:
 
     var value: Vec3
 
+    # NOTE: We use the dict syntax to avoid calling the __init__ method and thus
+    # avoid the normalization check.
     alias I: Self = Self {value: Vec3.I}
     alias J: Self = Self {value: Vec3.J}
     alias K: Self = Self {value: Vec3.K}
 
     fn __init__(x: F, y: F, z: F) -> Self:
-        debug_assert(x != 0.0 or y != 0.0 or z != 0.0, "Cannot normalize the zero vector.")
-        return Vec3(x, y, z).norm()
+        let vec3 = Vec3(x, y, z)
+        let mag = vec3.mag()
+        debug_assert(mag != 0.0, "Cannot normalize a zero vector.")
+        return Unit3 {value: vec3 / mag}
 
     fn __init__(value: Vec3) -> Self:
-        debug_assert(
-            value[0] != 0.0 or value[1] != 0.0 or value[2] != 0.0,
-            "Cannot normalize the zero vector.",
-        )
-        return value.norm()
+        let mag = value.mag()
+        debug_assert(mag != 0.0, "Cannot normalize a zero vector.")
+        return Unit3 {value: value / mag}
 
     fn __eq__(self, other: Self) -> Bool:
         return self.value == other.value

@@ -1,6 +1,5 @@
-from vec3 import Vec3
-
-from types import F
+from .types import F
+from .vec3 import Vec3
 
 
 @value
@@ -10,7 +9,8 @@ struct Point3:
 
     var value: Vec3
 
-    alias ORIGIN: Self = Self {value: Vec3.ZERO}
+    alias ORIGIN: Self = Self(0.0, 0.0, 0.0)
+    """The origin point."""
 
     fn __init__(x: F = 0.0, y: F = 0.0, z: F = 0.0) -> Self:
         return Self {value: Vec3(x, y, z)}
