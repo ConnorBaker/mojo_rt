@@ -22,20 +22,23 @@ alias Material = fn (
 struct Lambertian:
     var albedo: Color
 
-    fn scatter(self, r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
-        let scatter_direction: Vec3 = rec.normal + Unit3.rand()
-        let scatter_direction_mag = scatter_direction.mag()
-        let scatter_direction_unit: Unit3
-        if isclose(scatter_direction_mag, 0.0):
-            scatter_direction_unit = rec.normal
-        else:
-            scatter_direction_unit = Unit3 {value: scatter_direction / scatter_direction_mag}
+    fn scatter(self) -> Material:
+        fn _scatter(r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
+            let scatter_direction: Vec3 = rec.normal + Unit3.rand()
+            let scatter_direction_mag = scatter_direction.mag()
+            let scatter_direction_unit: Unit3
+            if isclose(scatter_direction_mag, 0.0):
+                scatter_direction_unit = rec.normal
+            else:
+                scatter_direction_unit = Unit3 {value: scatter_direction / scatter_direction_mag}
 
-        # NOTE: Lambertian always scatters.
-        let did_scatter = True
-        let scattered = Ray3(rec.p, scatter_direction_unit)
-        let attenuation = self.albedo
-        return (did_scatter, attenuation, scattered)
+            # NOTE: Lambertian always scatters.
+            let did_scatter = True
+            let scattered = Ray3(rec.p, scatter_direction_unit)
+            let attenuation = self.albedo
+            return (did_scatter, attenuation, scattered)
+
+        return _scatter
 
 
 @value
@@ -43,12 +46,15 @@ struct Lambertian:
 struct Metal:
     var albedo: Color
 
-    fn scatter(self, r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
-        """
-        Gets a reflected ray from the hit point.
-        """
-        let reflected: Unit3 = Unit3(r_in.direction.reflect(rec.normal))
-        let scattered = Ray3(rec.p, reflected)
-        let did_scatter = True
-        let attenuation = self.albedo
-        return (did_scatter, attenuation, scattered)
+    fn scatter(self) -> Material:
+        fn _scatter(r_in: Ray3, rec: HitRecord, /) -> Tuple[Bool, Color, Ray3]:
+            """
+            Gets a reflected ray from the hit point.
+            """
+            let reflected: Unit3 = Unit3(r_in.direction.reflect(rec.normal))
+            let scattered = Ray3(rec.p, reflected)
+            let did_scatter = True
+            let attenuation = self.albedo
+            return (did_scatter, attenuation, scattered)
+
+        return _scatter
