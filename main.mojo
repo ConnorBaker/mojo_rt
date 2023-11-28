@@ -10,23 +10,12 @@ from mojo_rt.viewport import ViewportConfig, Viewport
 
 
 fn setup_world() -> HittableList:
-    let green_horizon: Sphere = Sphere(Point3(y=-100.5, z=-1.0), 100.0)
-    let normal_mapped_sphere: Sphere = Sphere(Point3(z=-1.0), 0.5)
+    let green_horizon: Hittable = Sphere(Point3(y=-100.5, z=-1.0), 100.0).hit()
+    let normal_mapped_sphere: Hittable = Sphere(Point3(z=-1.0), 0.5).hit()
 
     var world = HittableList()
-    # NOTE: Cannot just add the hittable method from the spheres directly -- we recieve the following error:
-    # world.add(green_horizon.hit)
-    # - invalid call to 'add': method argument #0 cannot be converted from unknown overload to
-    #   'fn(Ray3, Interval, /) capturing -> HitRecord'
-    # world.add(normal_mapped_sphere.hit)
-    # - invalid call to 'add': method argument #0 cannot be converted from unknown overload to
-    #   'fn(Ray3, Interval, /) capturing -> HitRecord'
-    # Instead, we need to either access the hit method in the original definitions, or we need to assign the hit
-    # method to a variable and then add that variable to the world.
-    let green_horizon_hittable: Hittable = green_horizon.hit
-    let normal_mapped_sphere_hittable: Hittable = normal_mapped_sphere.hit
-    world.add(green_horizon_hittable)
-    world.add(normal_mapped_sphere_hittable)
+    world.add(green_horizon)
+    world.add(normal_mapped_sphere)
 
     return world
 
