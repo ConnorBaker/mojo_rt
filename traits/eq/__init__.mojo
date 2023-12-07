@@ -1,0 +1,6 @@
+trait Eq:
+    fn __eq__(self, other: Self) -> Bool:
+        ...
+
+    fn __ne__(self, other: Self) -> Bool:
+        ...
