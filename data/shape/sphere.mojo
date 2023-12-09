@@ -13,7 +13,10 @@ from types import F
 
 @value
 @register_passable("trivial")
-struct Sphere(Hittable, Stringable):
+struct Sphere(
+    Hittable,
+    Stringable,
+):
     """A sphere in 3D space."""
 
     var center: Point3

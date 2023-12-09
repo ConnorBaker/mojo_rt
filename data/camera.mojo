@@ -4,13 +4,13 @@ from utils.vector import _VecIter
 
 from data.color import Color
 from data.hit_record import HitRecord
+from data.object_list import ObjectList
 from data.point3 import Point3
 from data.ray3 import Ray3
 from data.renderer import Renderer, RendererConfig
 from data.vector.unit3 import Unit3
 from data.vector.vec3 import Vec3
 from data.viewport import Viewport, ViewportConfig
-from data.object_list import ObjectList
 from types import F4, F
 
 

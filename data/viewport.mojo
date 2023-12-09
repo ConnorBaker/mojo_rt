@@ -115,7 +115,9 @@ struct Viewport:
         """Gets the center of the pixel at (x, y)."""
         return Vec3 {
             value: fma[DTYPE, 4](
-                config.delta_v.value, y, fma[DTYPE, 4](config.delta_u.value, x, config.loc_00.value.value)
+                config.delta_v.value,
+                y,
+                fma[DTYPE, 4](config.delta_u.value, x, config.loc_00.value.value),
             )
         }
 

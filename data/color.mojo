@@ -5,13 +5,17 @@ from data.ray3 import Ray3
 from data.vector.f4 import F4Utils
 from data.vector.unit3 import Unit3
 from data.vector.vec3 import Vec3
-from traits.eq import Eq
+from traits.hom.eq import HomEq
 from types import F
 
 
 @value
 @register_passable("trivial")
-struct Color(CollectionElement, Eq, Stringable):
+struct Color(
+    CollectionElement,
+    HomEq,
+    Stringable,
+):
     """A color in RGB space."""
 
     var value: Vec3

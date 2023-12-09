@@ -1,12 +1,15 @@
 from data.vector.f4 import F4Utils
 from data.vector.vec3 import Vec3
-from traits.ord import Ord
+from traits.hom.ord import HomOrd
 from types import F4, F
 
 
 @value
 @register_passable("trivial")
-struct Point3(Stringable, Ord):
+struct Point3(
+    HomOrd,
+    Stringable,
+):
     var value: Vec3
 
     alias Origin: Self = Self()

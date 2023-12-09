@@ -2,10 +2,10 @@ from math import sqrt, pow
 from random import randn_float64, random_float64
 
 from data.vector.f4 import F4Utils
-from traits.arith import Arith
-from traits.arith.scalar import ScalarArith
+from traits.het.arith.scalar import HetScalarArith
+from traits.hom.arith import HomArith
+from traits.hom.ord import HomOrd
 from traits.ops.vector import VectorOps
-from traits.ord import Ord
 from traits.random import Random, RandomNormal
 from types import F, F4
 
@@ -13,11 +13,11 @@ from types import F, F4
 @value
 @register_passable("trivial")
 struct Vec3(
-    Arith,
-    Ord,
+    HetScalarArith,
+    HomArith,
+    HomOrd,
     Random,
     RandomNormal,
-    ScalarArith,
     Stringable,
     VectorOps,
 ):

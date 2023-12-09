@@ -2,15 +2,21 @@ from math import sqrt, pow, rsqrt, isclose
 
 from data.vector.f4 import F4Utils
 from data.vector.vec3 import Vec3
+from traits.hom.ord import HomOrd
 from traits.ops.vector import VectorOps
-from traits.ord import Ord
 from traits.random import Random, RandomNormal
 from types import F4, F
 
 
 @value
 @register_passable("trivial")
-struct Unit3(Stringable, Ord, Random, RandomNormal, VectorOps):
+struct Unit3(
+    HomOrd,
+    Random,
+    RandomNormal,
+    Stringable,
+    VectorOps,
+):
     """A 3D unit vector."""
 
     var value: Vec3
