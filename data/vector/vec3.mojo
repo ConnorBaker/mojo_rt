@@ -2,6 +2,7 @@ from math import sqrt, pow
 from random import randn_float64, random_float64
 
 from data.vector.f4 import F4Utils
+from data.vector.unit3 import Unit3
 from traits.het.arith.scalar import HetScalarArith
 from traits.hom.arith import HomArith
 from traits.hom.ord import HomOrd
@@ -127,7 +128,6 @@ struct Vec3(
 
     # End implementation of ScalarArith
 
-    # Begin implementation of VectorOps
     # NOTE: For some of these, we use the dictionary constructor to avoid
     # having to pass through the sanitization step in our constructor when we take
     # in an F4.
@@ -138,6 +138,14 @@ struct Vec3(
     fn rotate_right(self) -> Self:
         """Rotate the vector right by one component."""
         return Self {value: self.value.shuffle[2, 0, 1, 3]()}
+
+    # Begin implementation of VectorOps
+    fn reflect(self, other: Unit3) -> Self:
+        # Because this is a unit vector, we have no need to divide the dot product by the magnitude of this vector.
+        return self - 2.0 * self.dot(other.value) * other.value
+
+    fn reflect(self, other: Self) -> Self:
+        return self - 2.0 * (self.dot(other) / other.mag_sq()) * other
 
     fn dot(self, other: Self) -> F:
         """Compute the dot product of two vectors."""
@@ -187,3 +195,6 @@ struct Vec3(
 
     fn sq(self) -> Self:
         return Self {value: pow(self.value, 2)}
+
+    fn norm(self) -> Unit3:
+        return Unit3(self)

@@ -1,36 +1,42 @@
-from random import seed, random_float64, random_si64
+from builtin.io import _printf
+from random import seed
+from time import now
 
 from data.camera import Camera, CameraConfig
-from data.object_list import ObjectList
-from data.point3 import Point3
-from data.renderer import RendererConfig, Renderer
-from data.shape.sphere import Sphere
-from data.vector.vec3 import Vec3
-from data.viewport import ViewportConfig, Viewport
-from traits.hittable import Hittable
-
-
-fn setup_world() -> ObjectList[Sphere]:
-    var world = ObjectList[Sphere]()
-    world.add(Sphere(Point3(y=-100.5, z=-1.0), 100.0))
-    world.add(Sphere(Point3(z=-1.0), 0.5))
-    return world
+from data.image import Image
+from data.renderer import RendererConfig
+from data.viewport import ViewportConfig
+from data.world import World
+from types import DTYPE
 
 
 fn setup_config() -> CameraConfig:
-    alias renderer_config = RendererConfig(samples_per_pixel=32, use_lambertian=False)
+    alias renderer_config = RendererConfig(samples_per_pixel=128, use_lambertian=False)
     alias viewport_config = ViewportConfig(image_width=1600)
-    alias config = CameraConfig(renderer_config, viewport_config)
-    return config
+    return CameraConfig(renderer_config, viewport_config)
 
 
-fn do_render() raises -> None:
-    alias config = setup_config()
-    alias camera = Camera[config]()
-    let pixels = camera.render(setup_world())
-    camera.write_render(pixels)
+fn do_render(seed_value: Int) raises -> Tensor[DTYPE]:
+    seed(seed_value)
+    alias camera = Camera[setup_config()]()
+    alias world = World()
+    print("Beginning render...")
+    let time_start = now()
+    let img = camera.render(world)
+    let time_end = now()
+    let time_elapsed_sec = (time_end - time_start) * 1e-9
+    _printf("Rendered in %.3f seconds\n", time_elapsed_sec)
+    return img
+
+
+fn write_render(img: Tensor[DTYPE]) raises -> None:
+    print("Writing render to file...")
+    let time_start = now()
+    Image.write_render(img)
+    let time_end = now()
+    let time_elapsed_sec = (time_end - time_start) * 1e-9
+    _printf("Written in %.3f seconds\n", time_elapsed_sec)
 
 
 fn main() raises -> None:
-    seed(42)
-    do_render()
+    write_render(do_render(42))

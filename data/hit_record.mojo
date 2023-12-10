@@ -1,9 +1,8 @@
 from data.point3 import Point3
 from data.ray3 import Ray3
 from data.vector.unit3 import Unit3
-from data.vector.vec3 import Vec3
 from traits.hom.eq import HomEq
-from types import F, NEGINF
+from types import F
 
 
 @value
@@ -22,16 +21,6 @@ struct HitRecord(
     """The length of the ray at the point of intersection."""
     var front_face: Bool
     """Whether the ray hit the front or the back of the surface."""
-
-    alias BOGUS: Self = Self {
-        p: Point3.Origin,
-        normal: Unit3 {value: Vec3(NEGINF, NEGINF, NEGINF)},
-        t: NEGINF,
-        front_face: False,
-    }
-
-    fn is_bogus(self) -> Bool:
-        return self == Self.BOGUS
 
     fn __init__(p: Point3, t: F, r: Ray3, outward_normal: Unit3) -> HitRecord:
         """

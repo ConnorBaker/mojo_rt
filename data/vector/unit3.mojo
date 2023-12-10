@@ -1,6 +1,5 @@
-from math import sqrt, pow, rsqrt, isclose
+from math import sqrt, rsqrt, isclose
 
-from data.vector.f4 import F4Utils
 from data.vector.vec3 import Vec3
 from traits.hom.ord import HomOrd
 from traits.ops.vector import VectorOps
@@ -22,11 +21,6 @@ struct Unit3(
     var value: Vec3
 
     # Begin constructors
-    @staticmethod
-    fn norm(vec: Vec3) -> Self:
-        """Normalize a vector."""
-        return Self(vec)
-
     @staticmethod
     fn __init__(vec: Vec3) -> Self:
         var mag_sq = vec.mag_sq()
@@ -64,7 +58,6 @@ struct Unit3(
 
     # End implementation of Ord
 
-    # Begin implementation of VectorOps
     # NOTE: For some of these, we use the dictionary constructor to avoid
     # having to pass through the sanitization step in our constructor when we take
     # in an F4.
@@ -76,8 +69,15 @@ struct Unit3(
         """Rotate the vector right by one component."""
         return Self {value: self.value.rotate_right()}
 
+    # Begin implementation of VectorOps
     # This exists so trying to take the cross product of a Unit3 with a Vec3
     # doesn't cause the Vec3 to be coerced into a Unit3.
+    fn reflect(self, other: Vec3) -> Vec3:
+        return self.value.reflect(other)
+
+    fn reflect(self, other: Self) -> Self:
+        return self.value.reflect(other)
+
     fn dot(self, other: Vec3) -> F:
         """Compute the dot product of two vectors."""
         return self.value.dot(other)
@@ -158,6 +158,3 @@ struct Unit3(
     # Negation is magnitude-preserving so we use the dictionary constructor
     fn __neg__(self) -> Self:
         return Self {value: -self.value}
-
-    fn reflect(self, vec: Vec3) -> Vec3:
-        return vec - 2.0 * self.value * vec.dot(self.value)
