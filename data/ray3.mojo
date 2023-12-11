@@ -1,6 +1,9 @@
+from math.math import fma
+
 from data.point3 import Point3
 from data.vector.unit3 import Unit3
-from types import F
+from data.vector.vec3 import Vec3
+from types import DTYPE, F
 
 
 @value
@@ -18,4 +21,4 @@ struct Ray3(Stringable):
         """
         Returns the point at the given distance along the ray.
         """
-        return self.origin.value + self.direction.value * t
+        return Point3 {value: Vec3 {value: fma[DTYPE, 4](t, self.direction.value.value, self.origin.value.value)}}

@@ -4,7 +4,7 @@ from data.ray3 import Ray3
 from data.vector.unit3 import Unit3
 from data.vector.vec3 import Vec3
 from traits.hom.eq import HomEq
-from types import F
+from types import DTYPE, F, F4
 
 
 @value
@@ -34,14 +34,17 @@ struct Color(
         """
         Returns a gradient background sky background color.
 
-        Use a linear blend: blended_value = (1 - a) * start_value + a * end_value.
+        Use a linear blend:
+            blended_value = (1 - a) * start_value + a * end_value
+            blended_value = start_value - a * start_value + a * end_value
+            blended_value = start_value + a * (end_value - start_value)
+            blended_value = fma(a, end_value - start_value, start_value)
         Also known as a linear interpolation or "lerp".
         """
-        # TODO: Rewrite as FMA
         let unit_direction: Unit3 = r.direction
-        let a: F = 0.5 * (unit_direction.value.value[1] + 1.0)
-        let gradient: Self = (1.0 - a) * Self.White.value + a * Self.SkyBlue.value
-        return gradient
+        let a: F = fma[DTYPE, 1](0.5, unit_direction.value.value[1], 0.5)
+        let gradient: F4 = fma[DTYPE, 4](a, Self.SkyBlue.value.value - Self.White.value.value, Self.White.value.value)
+        return Self {value: Vec3 {value: gradient}}
 
     # Begin Eq implementation
     fn __eq__(self, other: Self) -> Bool:
