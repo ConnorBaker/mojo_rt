@@ -1,4 +1,8 @@
 from math.math import sqrt
+from memory.memory import memcpy
+from os.env import setenv
+from python.object import PythonObject
+from python.python import Python
 from utils.index import Index
 
 from data.interval_2d import Interval2D
@@ -10,7 +14,7 @@ from types import DTYPE
 struct Image:
     """Tensor is assumed to be of shape HW3."""
 
-    alias IntensityBound: Interval2D = Interval2D(0.0, 1.0 - 1e-5)
+    alias IntensityBound: Interval2D = Interval2D(0.0, 1.0 - 1e-9)
     """The interval of valid color intensities."""
 
     @staticmethod
@@ -38,25 +42,43 @@ struct Image:
         return img
 
     @staticmethod
-    fn write_render(owned img: Tensor[DTYPE]) raises -> None:
-        Self.write_render(Self.to_int(Self.clamp(Self.linear_to_gamma(img))))
+    fn to_numpy_image(owned img: Tensor[DType.float32]) raises -> PythonObject:
+        let np = Python.import_module("numpy")
 
-    @staticmethod
-    fn write_render(owned img: Tensor[DType.uint8]) raises -> None:
-        """Writes the pixels to a PPM file."""
         let shape = img.shape()
         let H = shape[0]
         let W = shape[1]
         let C = shape[2]
 
-        with open("./simple.ppm", "w") as f:
-            f.write("P3\n" + str(W) + " " + H + "\n255\n")
+        let np_img = np.zeros((H, W, C), np.float32)
 
-            # Write the pixels in row-major order
-            for h in range(H):
-                for w in range(W):
-                    for c in range(C):
-                        f.write(str(img[Index(h, w, c)]))
-                        f.write(" ")
-                    f.write("t")
-                f.write("\n")
+        # We use raw pointers to efficiently copy the pixels to the numpy array
+        let out_pointer = Pointer(
+            __mlir_op.`pop.index_to_pointer`[_type = __mlir_type[`!kgen.pointer<scalar<f32>>`]](
+                SIMD[DType.index, 1](np_img.__array_interface__["data"][0].__index__()).value
+            )
+        )
+        let in_pointer = Pointer(
+            __mlir_op.`pop.index_to_pointer`[_type = __mlir_type[`!kgen.pointer<scalar<f32>>`]](
+                SIMD[DType.index, 1](img.data().__as_index()).value
+            )
+        )
+
+        _ = memcpy(out_pointer, in_pointer, H * W * C)
+        return np_img
+
+    @staticmethod
+    fn write_render(owned img: Tensor[DTYPE]) raises -> None:
+        """Writes the pixels to an EXR file."""
+        _ = setenv("OPENCV_IO_ENABLE_OPENEXR", "1", True)
+        let cv = Python.import_module("cv2")
+        let img_f32 = Self.clamp(img).astype[DType.float32]()
+        let np_img_f32 = Self.to_numpy_image(img_f32)
+        let np_img_f32_bgr = cv.cvtColor(np_img_f32, cv.COLOR_RGB2BGR)
+        let imwrite_flags: PythonObject = [
+            int(cv.IMWRITE_EXR_TYPE),
+            int(cv.IMWRITE_EXR_TYPE_FLOAT),
+            int(cv.IMWRITE_EXR_COMPRESSION),
+            int(cv.IMWRITE_EXR_COMPRESSION_PXR24),
+        ]
+        _ = cv.imwrite("./simple.exr", np_img_f32_bgr, imwrite_flags)
