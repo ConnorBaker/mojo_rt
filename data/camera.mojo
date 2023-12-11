@@ -1,5 +1,5 @@
 from algorithm.functional import parallelize
-from math.math import divmod, fma, reciprocal
+from math.math import divmod, reciprocal
 from utils._optional import Optional
 from utils.index import Index
 
@@ -103,16 +103,13 @@ struct Camera[config: CameraConfig](Stringable):
         This is used when `samples_per_pixel` > 1.
         This is a box filter; see more: https://my.eng.utah.edu/~cs6965/slides/pathtrace.pdf.
         """
-        alias samples_per_pixel_recip: F4 = reciprocal[DTYPE, 1](config.renderer.samples_per_pixel)
-        var pixel_color_raw: F4 = Color.Black.value.value
+        alias samples_per_pixel_recip: F = reciprocal[DTYPE, 1](config.renderer.samples_per_pixel)
+        var pixel_color: Vec3 = Color.Black.value
         for _ in range(config.renderer.samples_per_pixel):
             let sampled_pixel_center: Point3 = pixel_center.value + Viewport.sample_pixel_square(config.viewport).value
-            pixel_color_raw = fma(
-                self.pixel_no_filter(sampled_pixel_center, world).value.value, samples_per_pixel_recip, pixel_color_raw
-            )
+            let pixel_color_raw: Color = self.pixel_no_filter(sampled_pixel_center, world)
+            pixel_color = pixel_color_raw.value.fma(samples_per_pixel_recip, pixel_color)
 
-        # Use the dictionary constructor for Vec3 because the operations prior will not change the last component.
-        let pixel_color: Color = Vec3 {value: pixel_color_raw}
         return pixel_color
 
     fn get_ray_color(self, ray: Ray3, world: World) -> Color:

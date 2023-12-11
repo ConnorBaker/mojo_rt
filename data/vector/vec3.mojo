@@ -1,4 +1,4 @@
-from math import sqrt, pow
+from math import fma, pow, sqrt
 from random import randn_float64, random_float64
 
 from data.vector.f4 import F4Utils
@@ -6,14 +6,16 @@ from data.vector.unit3 import Unit3
 from traits.het.arith.scalar import HetScalarArith
 from traits.hom.arith import HomArith
 from traits.hom.ord import HomOrd
+from traits.ops.fma import FMAOps
 from traits.ops.vector import VectorOps
 from traits.random import Random, RandomNormal
-from types import F, F4
+from types import DTYPE, F, F4
 
 
 @value
 @register_passable("trivial")
 struct Vec3(
+    FMAOps,
     HetScalarArith,
     HomArith,
     HomOrd,
@@ -139,15 +141,47 @@ struct Vec3(
         """Rotate the vector right by one component."""
         return Self {value: self.value.shuffle[2, 0, 1, 3]()}
 
+    # Begin implementation of FMAOps
+    fn fma(self, b: F, c: F) -> Self:
+        return Self(fma[DTYPE, 4](self.value, b, c))
+
+    fn fma(self, b: F, c: F4) -> Self:
+        return Self(fma[DTYPE, 4](self.value, b, c))
+
+    fn fma(self, b: F, c: Self) -> Self:
+        # No risk of adding non-zero values
+        return Self {value: fma[DTYPE, 4](self.value, b, c.value)}
+
+    fn fma(self, b: F4, c: F) -> Self:
+        return Self(fma[DTYPE, 4](self.value, b, c))
+
+    fn fma(self, b: F4, c: F4) -> Self:
+        return Self(fma[DTYPE, 4](self.value, b, c))
+
+    fn fma(self, b: F4, c: Self) -> Self:
+        # No risk of adding non-zero values
+        return Self {value: fma[DTYPE, 4](self.value, b, c.value)}
+
+    fn fma(self, b: Self, c: F) -> Self:
+        return Self(fma[DTYPE, 4](self.value, b.value, c))
+
+    fn fma(self, b: Self, c: F4) -> Self:
+        return Self(fma[DTYPE, 4](self.value, b.value, c))
+
+    fn fma(self, b: Self, c: Self) -> Self:
+        """Returns the fused multiply-add of this vector and the given vectors."""
+        # No risk of adding non-zero values
+        return Self {value: fma[DTYPE, 4](self.value, b.value, c.value)}
+
+    # End implementation of FMAOps
+
     # Begin implementation of VectorOps
     fn reflect(self, other: Unit3) -> Self:
         # Because this is a unit vector, we have no need to divide the dot product by the magnitude of this vector.
-        # TODO: Rewrite as FMA?
-        return self - 2.0 * self.dot(other.value) * other.value
+        return other.value.fma(-2.0 * self.dot(other.value), self)
 
     fn reflect(self, other: Self) -> Self:
-        # TODO: Rewrite as FMA?
-        return self - 2.0 * (self.dot(other) / other.mag_sq()) * other
+        return other.fma(-2.0 * (self.dot(other) / other.mag_sq()), self)
 
     fn dot(self, other: Self) -> F:
         """Compute the dot product of two vectors."""

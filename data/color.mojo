@@ -43,8 +43,8 @@ struct Color(
         """
         let unit_direction: Unit3 = r.direction
         let a: F = fma[DTYPE, 1](0.5, unit_direction.value.value[1], 0.5)
-        let gradient: F4 = fma[DTYPE, 4](a, Self.SkyBlue.value.value - Self.White.value.value, Self.White.value.value)
-        return Self {value: Vec3 {value: gradient}}
+        let gradient: Color = (Self.SkyBlue.value - Self.White.value).fma(a, Self.White.value)
+        return gradient
 
     # Begin Eq implementation
     fn __eq__(self, other: Self) -> Bool:

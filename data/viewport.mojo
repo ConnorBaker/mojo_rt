@@ -1,4 +1,3 @@
-from math.math import fma
 from random import random_float64
 
 from data.point3 import Point3
@@ -113,17 +112,11 @@ struct Viewport:
     @staticmethod
     fn get_pixel_center(config: ViewportConfig, x: Int, y: Int) -> Point3:
         """Gets the center of the pixel at (x, y)."""
-        return Vec3 {
-            value: fma[DTYPE, 4](
-                config.delta_v.value,
-                y,
-                fma[DTYPE, 4](config.delta_u.value, x, config.loc_00.value.value),
-            )
-        }
+        return config.delta_v.fma(F(y), config.delta_u.fma(F(x), config.loc_00.value))
 
     @staticmethod
     fn sample_pixel_square(config: ViewportConfig) -> Point3:
         """Returns a random point in the square surrounding a pixel at the origin."""
         let px: F = -0.5 * random_float64()
         let py: F = -0.5 * random_float64()
-        return Vec3 {value: fma[DTYPE, 4](config.delta_v.value, py, config.delta_u.value * px)}
+        return config.delta_v.fma(py, config.delta_u * px)
