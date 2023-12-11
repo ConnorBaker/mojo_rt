@@ -11,7 +11,7 @@ from types import DTYPE
 
 
 fn setup_config() -> CameraConfig:
-    alias renderer_config = RendererConfig(samples_per_pixel=1, use_lambertian=False)
+    alias renderer_config = RendererConfig(samples_per_pixel=32, use_lambertian=True)
     alias viewport_config = ViewportConfig(image_width=4800)
     return CameraConfig(renderer_config, viewport_config)
 

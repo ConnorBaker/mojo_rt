@@ -142,9 +142,11 @@ struct Vec3(
     # Begin implementation of VectorOps
     fn reflect(self, other: Unit3) -> Self:
         # Because this is a unit vector, we have no need to divide the dot product by the magnitude of this vector.
+        # TODO: Rewrite as FMA?
         return self - 2.0 * self.dot(other.value) * other.value
 
     fn reflect(self, other: Self) -> Self:
+        # TODO: Rewrite as FMA?
         return self - 2.0 * (self.dot(other) / other.mag_sq()) * other
 
     fn dot(self, other: Self) -> F:
@@ -153,6 +155,7 @@ struct Vec3(
 
     fn cross(self, other: Self) -> Self:
         """Compute the cross product of two vectors."""
+        # TODO: Rewrite as FMA?
         return self.rotate_left() * other.rotate_right() - self.rotate_right() * other.rotate_left()
 
     fn mag_sq(self) -> F:

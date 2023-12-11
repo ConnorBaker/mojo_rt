@@ -17,7 +17,10 @@ struct World(Stringable):
 
     fn __init__() -> Self:
         return Self {
-            spheres: VariadicList[Sphere](Sphere(Point3(y=-100.5, z=-1.0), 100.0), Sphere(Point3(z=-1.0), 0.5)),
+            spheres: VariadicList[Sphere](
+                Sphere(Point3(y=-100.5, z=-1.0), 100.0),
+                Sphere(Point3(z=-1.0), 0.5),
+            )
         }
 
     fn __str__(self) -> String:

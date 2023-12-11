@@ -1,4 +1,4 @@
-from math import sqrt, pow
+from math import fma, pow, sqrt
 
 from data.ray3 import Ray3
 from data.vector.unit3 import Unit3
@@ -37,6 +37,7 @@ struct Color(
         Use a linear blend: blended_value = (1 - a) * start_value + a * end_value.
         Also known as a linear interpolation or "lerp".
         """
+        # TODO: Rewrite as FMA
         let unit_direction: Unit3 = r.direction
         let a: F = 0.5 * (unit_direction.value.value[1] + 1.0)
         let gradient: Self = (1.0 - a) * Self.White.value + a * Self.SkyBlue.value
